@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+
 @Slf4j
 @RestController
 @RequestMapping("/test")
@@ -14,7 +16,8 @@ public class TestController {
     @GetMapping("/ping")
     public ApiResponse<String> ping() {
         log.info("빠른 API 테스트 시작");
-        return ApiResponse.success("pong");
+        LocalDateTime l = LocalDateTime.now();
+        return ApiResponse.success("pong: " + l);
     }
 
     @GetMapping("/slow")

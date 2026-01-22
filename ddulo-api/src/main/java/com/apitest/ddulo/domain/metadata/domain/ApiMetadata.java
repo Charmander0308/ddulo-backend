@@ -24,10 +24,16 @@ public class ApiMetadata {
 
     private Integer updateIntervalDay; // 예: 7일
 
-    public boolean isUpdatable() {
-        if (updatedAt == null || updateIntervalDay == null) {
+    //업데이트가 가능한지 여부
+    public boolean isUpdateDue() {
+        if (updateIntervalDay == null) {
+            return false;
+        }
+
+        if (updatedAt == null) {
             return true;
         }
+
         return updatedAt.plusDays(updateIntervalDay)
                 .isBefore(LocalDateTime.now());
     }

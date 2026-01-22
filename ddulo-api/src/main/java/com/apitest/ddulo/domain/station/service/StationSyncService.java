@@ -2,14 +2,17 @@ package com.apitest.ddulo.domain.station.service;
 
 import com.apitest.ddulo.domain.metadata.domain.ApiMetadata;
 import com.apitest.ddulo.domain.metadata.repository.ApiMetadataRepository;
+import com.apitest.ddulo.domain.metadata.service.ApiMetadataService;
 import com.apitest.ddulo.domain.station.domain.Station;
 import com.apitest.ddulo.domain.station.dto.PuzzleStationResponseDto;
 import com.apitest.ddulo.domain.station.dto.StationItemDto;
 import com.apitest.ddulo.domain.station.repository.StationRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StationSyncService {
@@ -19,32 +22,46 @@ public class StationSyncService {
     private final StationApiClient stationApiClient;
     private final StationRepository stationRepository;
     private final ApiMetadataRepository apiMetadataRepository;
+    private final ApiMetadataService apiMetadataService;
 
     @Transactional
     public void syncStationsIfNeeded() {
 
-        ApiMetadata metadata = apiMetadataRepository
-                .findByApiName(API_NAME)
-                .orElseGet(() ->
-                        apiMetadataRepository.save(
-                                ApiMetadata.builder()
-                                        .apiName(API_NAME)
-                                        .updateIntervalDay(null) // 최초 1회
-                                        .build()
-                        )
-                );
-
-        // 🔐 중복 실행 방지
-        if (!metadata.isUpdatable()) {
+        // 가져올 필요 있는지 판단
+        if (!apiMetadataService.isApiCallNeeded(API_NAME)) {
+            log.info("Exit info already synced. Skipping.");
             return;
         }
+        log.info("No exit info found (or update needed). Starting sync...");
 
+        // 외부 API 호출
+        syncStations();
+
+        //성공 후 메타데이터 갱신 (없으면 생성, 있으면 업데이트)
+        ApiMetadata metadata = apiMetadataRepository.findByApiName(API_NAME)
+                .orElseGet(() -> ApiMetadata.builder()
+                        .apiName(API_NAME)
+                        .updateIntervalDay(null) // null : 최초 1회만, N : N일마다 업데이트
+                        .build());
+
+        metadata.markUpdated(); // 현재 시간 찍기
+        apiMetadataRepository.save(metadata);
+    }
+
+    @Transactional
+    public void syncStations() {
         int offset = 0;
         int limit = 100;
 
         while (true) {
+            log.info("Fetching station info offset: {}, limit: {}", offset, limit);
             PuzzleStationResponseDto response =
                     stationApiClient.fetchStations(offset, limit);
+
+            if (response == null || response.getContents() == null) {
+                log.error("Failed to fetch station info");
+                break;
+            }
 
             for (StationItemDto item : response.getContents()) {
 
@@ -60,11 +77,10 @@ public class StationSyncService {
             }
 
             offset += limit;
-            if (offset >= response.getStatus().getTotalCount()) {
+            if (response.getStatus() == null || offset >= response.getStatus().getTotalCount()) {
                 break;
             }
         }
-
-        metadata.markUpdated();
+        log.info("Station info sync completed.");
     }
 }
