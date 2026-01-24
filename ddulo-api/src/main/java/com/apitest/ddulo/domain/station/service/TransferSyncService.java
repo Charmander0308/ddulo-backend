@@ -3,6 +3,7 @@ package com.apitest.ddulo.domain.station.service;
 import com.apitest.ddulo.domain.metadata.domain.ApiMetadata;
 import com.apitest.ddulo.domain.metadata.repository.ApiMetadataRepository;
 import com.apitest.ddulo.domain.metadata.service.ApiMetadataService;
+import com.apitest.ddulo.domain.station.client.TransferApiClient;
 import com.apitest.ddulo.domain.station.domain.Station;
 import com.apitest.ddulo.domain.station.domain.Transfer;
 import com.apitest.ddulo.domain.station.dto.FastTransferResponseDto;

@@ -1,5 +1,6 @@
-package com.apitest.ddulo.domain.station.service;
+package com.apitest.ddulo.domain.station.initializer;
 
+import com.apitest.ddulo.domain.station.service.ExitSyncService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,12 +11,12 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @DependsOn("stationDataInitializer") // Station 데이터가 먼저 초기화되어야 함
-public class TransferDataInitializer {
+public class ExitDataInitializer {
 
-    private final TransferSyncService transferSyncService;
+    private final ExitSyncService exitSyncService;
 
     @PostConstruct
     public void init() {
-        transferSyncService.syncTransferInfoIfNeeded();
+        exitSyncService.syncExitInfoIfNeeded();
     }
 }

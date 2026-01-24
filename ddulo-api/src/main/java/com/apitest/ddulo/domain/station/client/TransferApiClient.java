@@ -1,4 +1,4 @@
-package com.apitest.ddulo.domain.station.service;
+package com.apitest.ddulo.domain.station.client;
 
 import com.apitest.ddulo.domain.station.dto.FastTransferResponseDto;
 import lombok.RequiredArgsConstructor;
