@@ -1,5 +1,6 @@
 package com.apitest.ddulo.global.config;
 
+import org.apache.hc.core5.http.Header;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
@@ -20,6 +21,7 @@ public class RestTemplateConfig {
 
         CloseableHttpClient httpClient = HttpClients.custom()
                 .setConnectionManager(connectionManager)
+                .disableContentCompression()
                 .build();
 
         HttpComponentsClientHttpRequestFactory factory =
