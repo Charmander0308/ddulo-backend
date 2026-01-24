@@ -3,6 +3,7 @@ package com.apitest.ddulo.domain.station.service;
 import com.apitest.ddulo.domain.metadata.domain.ApiMetadata;
 import com.apitest.ddulo.domain.metadata.repository.ApiMetadataRepository;
 import com.apitest.ddulo.domain.metadata.service.ApiMetadataService;
+import com.apitest.ddulo.domain.station.client.SeoulApiClient;
 import com.apitest.ddulo.domain.station.domain.Exit;
 import com.apitest.ddulo.domain.station.domain.Station;
 import com.apitest.ddulo.domain.station.dto.SeoulExitResponseDto;
@@ -13,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 

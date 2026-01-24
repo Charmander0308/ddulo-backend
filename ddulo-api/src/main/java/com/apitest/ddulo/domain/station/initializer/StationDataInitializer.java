@@ -1,5 +1,6 @@
-package com.apitest.ddulo.domain.station.service;
+package com.apitest.ddulo.domain.station.initializer;
 
+import com.apitest.ddulo.domain.station.service.StationSyncService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
