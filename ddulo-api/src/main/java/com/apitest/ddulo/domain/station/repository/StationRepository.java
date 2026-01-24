@@ -18,4 +18,5 @@ public interface StationRepository
     List<Station> findByStationNameContaining(String keyword);
 
     Page<Station> findAll(Pageable pageable); // 페이지 단위 조회
-}
+
+    Optional<Station> findFirstByStationNameAndLineName(String stationName, String lineName);}
