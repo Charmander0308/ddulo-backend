@@ -128,8 +128,6 @@ public class ExitSyncService {
                 .carNumber(carAndDoor[0])
                 .doorNumber(carAndDoor[1])
                 .direction(direction)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
                 .build();
 
         exitRepository.save(exit);

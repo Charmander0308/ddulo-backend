@@ -2,7 +2,13 @@ package com.apitest.ddulo.domain.station.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
+
+@EntityListeners(AuditingEntityListener.class)
 @Entity
 @Table(name = "station")
 @Getter // 엔티티 접근용
@@ -24,6 +30,12 @@ public class Station {
     @Column(nullable = false)
     private String lineName; // "1호선"
 
-    // created_at, updated_at
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
 }
 
