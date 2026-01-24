@@ -1,6 +1,7 @@
 package com.apitest.ddulo.domain.subway.service;
 
 import com.apitest.ddulo.domain.subway.dto.PuzzleTrainCongestionResponseDto;
+import com.apitest.ddulo.global.common.enums.DayOfWeek;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -22,14 +23,16 @@ public class TrainCongestionApiClient {
 
     private final RestTemplate restTemplate;
 
-    public PuzzleTrainCongestionResponseDto fetchCongestion(String stationCode) {
+    public PuzzleTrainCongestionResponseDto fetchCongestion(String stationCode, DayOfWeek dow, int hour) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("appkey", apiKey);
 
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        String url = congestionUrl + "/" + stationCode;
+        String url = congestionUrl + "/" + stationCode
+                + "?dow=" + dow.name()
+                + "&hh=" + String.format("%02d", hour);
 
         try {
             ResponseEntity<PuzzleTrainCongestionResponseDto> response =
