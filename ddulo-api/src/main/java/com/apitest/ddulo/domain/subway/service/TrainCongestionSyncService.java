@@ -74,19 +74,23 @@ public class TrainCongestionSyncService {
             for (Station station : stations) {
 
                 // 🔥 디버깅용: 특정 역만 처리
-                if (!station.getStationCode().equals(DEBUG_STATION_CODE)) {
-                    continue;
-                }
+//                if (!station.getStationCode().equals(DEBUG_STATION_CODE)) {
+//                    continue;
+//                }
 
-                try {
-                    // 한 역 단위로 트랜잭션 적용, 개별 예외 처리
-                    saveStationCongestion(station, now);
-                } catch (Exception e) {
-                    // 개별 역 에러는 WARN 처리
-                    System.out.println(
-                            "⚠️ station=" + station.getStationName()
-                                    + " 처리 중 에러 발생: " + e.getMessage()
-                    );
+                for (DayOfWeek dow : DayOfWeek.values()) {
+                    for (int hour = 5; hour <= 23; hour++) {
+                        try {
+                            // 한 역 단위로 트랜잭션 적용, 개별 예외 처리
+                            saveStationCongestion(station, dow, hour);
+                        } catch (Exception e) {
+                            // 개별 역 에러는 WARN 처리
+                            System.out.println(
+                                    "⚠️ station=" + station.getStationName()
+                                            + " 처리 중 에러 발생: " + e.getMessage()
+                            );
+                        }
+                    }
                 }
             }
 
@@ -102,10 +106,10 @@ public class TrainCongestionSyncService {
      * 특정 역의 혼잡도 데이터 저장
      */
     @Transactional
-    public void saveStationCongestion(Station station, LocalDate now) {
+    public void saveStationCongestion(Station station, DayOfWeek dow, int hour) {
 
         PuzzleTrainCongestionResponseDto response =
-                apiClient.fetchCongestion(station.getStationCode());
+                apiClient.fetchCongestion(station.getStationCode(), dow, hour);
 
         if (response == null || response.getContents() == null) return;
 
