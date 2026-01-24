@@ -35,10 +35,10 @@ public class ExitSyncService {
     public void syncExitInfoIfNeeded() {
         // 가져올 필요 있는지 판단
         if (!apiMetadataService.isApiCallNeeded(API_NAME)) {
-            log.info("Exit info already synced. Skipping.");
+            log.info("Exit 데이터가 이미 존재하므로, 다음으로 넘어갑니다.");
             return;
         }
-        log.info("No exit info found (or update needed). Starting sync...");
+        log.info("Exit 데이터를 찾을 수 없으므로, 동기화를 실행합니다.");
 
         // 외부 API 호출
         syncExitInfo();
