@@ -31,10 +31,10 @@ public class Station {
     private String lineName; // "1호선"
 
     @Column
-    private Double latitude;
+    private Double latitude; //위도
 
     @Column
-    private Double longitude;
+    private Double longitude; //경도
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
