@@ -30,6 +30,12 @@ public class Station {
     @Column(nullable = false)
     private String lineName; // "1호선"
 
+    @Column
+    private Double latitude;
+
+    @Column
+    private Double longitude;
+
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -37,5 +43,10 @@ public class Station {
     @LastModifiedDate
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    public void updateCoordinates(Double latitude, Double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
 }
 
