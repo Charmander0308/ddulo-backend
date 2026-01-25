@@ -5,6 +5,7 @@ import com.apitest.ddulo.domain.station.dto.HomeInitResponseDto;
 import com.apitest.ddulo.domain.station.repository.StationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,9 +25,8 @@ public class HomeService {
     @Transactional(readOnly = true)
     public HomeInitResponseDto getHomeData(Double userLat, Double userLon) {
 
-        // DB에서 모든 역 데이터 가져오기 (쿼리 1회 발생)
-        // 데이터가 수천 건 이하라면 DB에서 필터링하는 것보다 애플리케이션 메모리에서 처리하는 게 빠를 수 있음
-        List<Station> allStations = stationRepository.findAll();
+        // DB에서 모든 역 데이터 가져오기 (쿼리 1회 발생), 캐싱
+        List<Station> allStations = getAllStationsCached();
 
         // 전체 역 리스트 변환 (거리 정보 없음)
         List<HomeInitResponseDto.StationDto> allStationDtos = allStations.stream()
@@ -80,5 +80,11 @@ public class HomeService {
     private static class StationWithDistance {
         final Station station;
         final int distance;
+    }
+
+    // 호출한 데이터를 메모리에 캐싱
+    @Cacheable(value = "stations")
+    public List<Station> getAllStationsCached() {
+        return stationRepository.findAll();
     }
 }
