@@ -22,10 +22,10 @@ public class StationRealtimeService {
         List<StationArrivalResponse.ArrivalInfo> upBoundList = List.of(
                 StationArrivalResponse.ArrivalInfo.builder()
                         .direction("성수(내선)행")
-                        .arrivalMsg("2분 55초 후")
-                        .trainNo("2234")
+                        .arrivalSec(155)
                         .currentStation("역삼역")
-                        .destination("성수")
+                        .destination("성수역")
+                        .isBoardable(true)
                         .carCongestions(List.of(
                                 StationArrivalResponse.CarCongestion.builder().carNo(1).congestionLevel(0).build(),
                                 StationArrivalResponse.CarCongestion.builder().carNo(2).congestionLevel(10).build(),
@@ -43,10 +43,10 @@ public class StationRealtimeService {
         List<StationArrivalResponse.ArrivalInfo> downBoundList = List.of(
                 StationArrivalResponse.ArrivalInfo.builder()
                         .direction("신도림(외선)행")
-                        .arrivalMsg("2분 30초 후")
-                        .trainNo("2235")
+                        .arrivalSec(210)
                         .currentStation("교대역")
-                        .destination("신도림")
+                        .destination("신도림역")
+                        .isBoardable(false)
                         .carCongestions(List.of(
                                 StationArrivalResponse.CarCongestion.builder().carNo(1).congestionLevel(100).build(),
                                 StationArrivalResponse.CarCongestion.builder().carNo(2).congestionLevel(90).build(),

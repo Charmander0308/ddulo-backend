@@ -39,14 +39,14 @@ public class StationArrivalResponse {
     public static class ArrivalInfo {
         @Schema(description = "진행방향", example = "성수(내선)행")
         private String direction;    // 방면 (예: 성수행)
-        @Schema(description = "도착까지 남은 시간", example = "2분 30초")
-        private String arrivalMsg;   // 도착 메시지 (예: 2분 30초 후, 전역 도착)
-        @Schema(description = "열차번호", example = "2235")
-        private String trainNo;      // 열차 번호
+        @Schema(description = "도착까지 남은 시간(초)", example = "150")
+        private Integer arrivalSec;   // 도착까지 남은 시간(초)
         @Schema(description = "현재 열차 위치", example = "선릉")
         private String currentStation; // 현재 열차 위치
         @Schema(description = "종착역", example = "성수역")
         private String destination;  // 종착역
+        @Schema(description = "탑승 가능여부", example = "true")
+        private Boolean isBoardable; // 탑승 가능여부
 
         @Schema(description = "열차 칸별 혼잡도")
         private List<CarCongestion> carCongestions; //열차 칸별 혼잡도
