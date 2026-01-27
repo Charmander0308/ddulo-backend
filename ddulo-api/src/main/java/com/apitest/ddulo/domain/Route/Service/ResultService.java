@@ -39,6 +39,7 @@ public class ResultService {
                 .stationName("역삼역")
                 .lineName("2호선")
                 .nextStationName("강남역")
+                .estimatedWatingSec(150)
                 .results(List.of(
                         ResultResponse.ResultInfo.builder()
                                 .carCongestions(createAllCarCongestions())
@@ -48,22 +49,19 @@ public class ResultService {
                                 .arrivalInfos(List.of(
                                         ResultResponse.ArrivalInfo.builder()
                                                 .direction("내선")
-                                                .arrivalMsg("2분 55초")
-                                                .trainNo("2234")
+                                                .arrivalSec(175)
                                                 .currentStation("선릉역")
                                                 .destination("성수(내선)역")
                                                 .build(),
                                         ResultResponse.ArrivalInfo.builder()
                                                 .direction("내선")
-                                                .arrivalMsg("5분 55초")
-                                                .trainNo("2235")
+                                                .arrivalSec(355)
                                                 .currentStation("삼성역")
                                                 .destination("성수(내선)역")
                                                 .build(),
                                         ResultResponse.ArrivalInfo.builder()
                                                 .direction("내선")
-                                                .arrivalMsg("8분 25초")
-                                                .trainNo("2236")
+                                                .arrivalSec(505)
                                                 .currentStation("종합운동장역")
                                                 .destination("성수(내선)역")
                                                 .build()
@@ -79,6 +77,7 @@ public class ResultService {
                 .stationName("광명사거리역")
                 .lineName("7호선")
                 .nextStationName(null)
+                .estimatedWatingSec(0)
                 .results(null)
                 .build();
     }
@@ -90,6 +89,7 @@ public class ResultService {
                         .stationName("대림역")
                         .lineName("7호선")
                         .nextStationName("남구로역")
+                        .estimatedWatingSec(150)
                         .results(List.of(
                                 ResultResponse.ResultInfo.builder()
                                         .carCongestions(createAllCarCongestions())
@@ -99,22 +99,19 @@ public class ResultService {
                                         .arrivalInfos(List.of(
                                                 ResultResponse.ArrivalInfo.builder()
                                                         .direction("하행")
-                                                        .arrivalMsg("2분 55초")
-                                                        .trainNo("1234")
+                                                        .arrivalSec(175)
                                                         .currentStation("신풍역")
                                                         .destination("온수역")
                                                         .build(),
                                                 ResultResponse.ArrivalInfo.builder()
                                                         .direction("하행")
-                                                        .arrivalMsg("5분 55초")
-                                                        .trainNo("1235")
+                                                        .arrivalSec(355)
                                                         .currentStation("보라매역")
                                                         .destination("석남역")
                                                         .build(),
                                                 ResultResponse.ArrivalInfo.builder()
                                                         .direction("하행")
-                                                        .arrivalMsg("8분 25초")
-                                                        .trainNo("1236")
+                                                        .arrivalSec(505)
                                                         .currentStation("신대방삼거리역")
                                                         .destination("온수역")
                                                         .build()
