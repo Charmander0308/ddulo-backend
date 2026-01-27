@@ -24,6 +24,7 @@ public class ResultResponse {
         private String stationName;     // 역명
         private String lineName;    // 노선명
         private String nextStationName;     //다음 역 명
+        private Integer estimatedWatingSec; //예상 대기시간(초)
 
         private List<ResultInfo> results;    //결과
     }
@@ -64,8 +65,7 @@ public class ResultResponse {
     @Builder
     public static class ArrivalInfo {
         private String direction;    // 방면 (예: 성수행)
-        private String arrivalMsg;   // 도착 메시지 (예: 2분 30초 후, 전역 도착)
-        private String trainNo;      // 열차 번호
+        private Integer arrivalSec;   // 도착까지 남은 시간 (예: 150 = 2분 30초 후)
         private String currentStation; // 현재 열차 위치
         private String destination;  // 종착역
     }
