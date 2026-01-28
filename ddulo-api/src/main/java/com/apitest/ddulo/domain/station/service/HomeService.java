@@ -9,6 +9,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,25 +35,31 @@ public class HomeService {
                 .collect(Collectors.toList());
 
         // 내 주변 1km 이내 역 필터링 및 거리 계산
-        List<HomeInitResponseDto.StationDto> nearbyStationDtos = allStations.stream()
-                // 위경도 데이터가 없는 역은 계산에서 제외 (NPE 방지)
-                .filter(station -> station.getLatitude() != null && station.getLongitude() != null)
-                .map(station -> {
-                    // 거리 계산 (미터 단위)
-                    int distance = calculateDistance(userLat, userLon, station.getLatitude(), station.getLongitude());
-                    return new StationWithDistance(station, distance); // 임시 객체로 매핑
-                })
-                .filter(dto -> dto.distance <= 1000) // 1km(1000m) 이내 필터링
-                .sorted(Comparator.comparingInt(dto -> dto.distance)) // 가까운 순 정렬
+        List<HomeInitResponseDto.StationDto> nearbyStationDtos;
+
+        if(userLat == null || userLon == null) {
+            nearbyStationDtos = Collections.emptyList();
+        } else {
+            nearbyStationDtos = allStations.stream()
+                    // 위경도 데이터가 없는 역은 계산에서 제외 (NPE 방지)
+                    .filter(station -> station.getLatitude() != null && station.getLongitude() != null)
+                    .map(station -> {
+                        // 거리 계산 (미터 단위)
+            int distance = calculateDistance(userLat, userLon, station.getLatitude(), station.getLongitude());
+            return new StationWithDistance(station, distance); // 임시 객체로 매핑
+        })
+                    .filter(dto -> dto.distance <= 1000) // 1km(1000m) 이내 필터링
+                    .sorted(Comparator.comparingInt(dto -> dto.distance)) // 가까운 순 정렬
 //                .limit(5) // 너무 많으면 상위 N개만 출력
-                .map(dto -> HomeInitResponseDto.StationDto.fromEntity(dto.station, dto.distance))
-                .collect(Collectors.toList());
+                    .map(dto -> HomeInitResponseDto.StationDto.fromEntity(dto.station, dto.distance))
+                    .collect(Collectors.toList());
+        }
 
         // 결과 조립 및 반환
         return HomeInitResponseDto.builder()
-                .nearbyStations(nearbyStationDtos)
-                .allStations(allStationDtos)
-                .build();
+                    .nearbyStations(nearbyStationDtos)
+                    .allStations(allStationDtos)
+                    .build();
     }
 
     // 하버사인(Haversine) 공식을 이용한 두 좌표 사이의 거리 계산
