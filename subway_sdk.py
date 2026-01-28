@@ -58,6 +58,27 @@ class SubwayHelper:
     def get_current_platform_data(self):
         return self.mqtt_data
 
+    # =================================================================
+    # [Step 1] 통계 데이터 적재용 (알고리즘 팀이 미리 돌리는 함수)
+    # =================================================================
+    def save_statistical_data(self, station_id, time_slot, car, station, total, best, comfort):
+        """
+        Redis Key: stats:{station_id}:{time_slot} (예: stats:233:14:30)
+        내용: 환승역 미래 예측 데이터 알맹이
+        """
+        payload = {
+            "carCongestions": car,
+            "stationCongestions": station,
+            "totalCongestions": total,
+            "bestBoardings": best,
+            "comfortBoarding": comfort,
+            "arrivalInfos": [] # 통계니까 도착정보는 없음
+        }
+        key = f"stats:{station_id}:{time_slot}"
+        
+        # 영구 저장 (나중에 갱신 전까지 유지)
+        self.redis.set(key, json.dumps(payload, ensure_ascii=False))
+        print(f"💾 [Pre-Load] 통계 데이터 적재 완료: {key}")
     # --- 데이터 저장 (Schema 정의) ---
     
     # =================================================================
@@ -75,7 +96,7 @@ class SubwayHelper:
                              start_station_data,
                              
                              # 3. 환승역 정보 리스트 (메타 + 알고리즘 결과의 리스트)
-                             transfer_stations_list,
+                             transfer_stations_meta,
                              
                              # 4. 도착역 정보 (메타만 있음)
                              end_station_data):
@@ -106,25 +127,34 @@ class SubwayHelper:
             ]
         }
 
-        # 2. Transfer Station 구조 조립 (리스트니까 반복문)
-        transfer_station_payload = []
-        for tf in transfer_stations_list:
-            transfer_station_payload.append({
-                "stationId": tf["stationId"],
+        # 2. Transfer Station (핵심: Redis 체이닝)
+        transfer_payload = []
+        
+        for tf in transfer_stations_meta:
+            # (1) 메타 정보에서 ID와 시간 꺼내기
+            tf_id = tf["stationId"]
+            tf_time = tf["timeSlot"] # 예: "14:30" (이 시간에 도착한다는 뜻)
+            
+            # (2) 미리 박아둔 통계 데이터 조회 (Chain)
+            stats_key = f"stats:{tf_id}:{tf_time}"
+            cached_data = self.redis.get(stats_key)
+            
+            # (3) 데이터가 있으면 파싱, 없으면 빈 껍데기
+            if cached_data:
+                stats_result = json.loads(cached_data)
+                print(f"🔗 [Chain] 환승역({tf_id}) 데이터 병합 성공 (Time: {tf_time})")
+            else:
+                print(f"⚠️ [Chain] 환승역({tf_id}) 데이터 없음! Key: {stats_key}")
+                stats_result = {} # 비어있으면 프론트에서 터질 수 있으니 주의
+
+            # (4) 환승역 최종 조립
+            transfer_payload.append({
+                "stationId": tf_id,
                 "stationName": tf["stationName"],
                 "lineName": tf["lineName"],
                 "direction": tf["direction"],
                 "estimatedWatingSec": tf["estimatedWatingSec"],
-                "results": [
-                    {
-                        "carCongestions": tf["carCongestions"],
-                        "stationCongestions": tf["stationCongestions"],
-                        "totalCongestions": tf["totalCongestions"],
-                        "bestBoardings": tf["bestBoardings"],
-                        "comfortBoarding": tf["comfortBoarding"],
-                        "arrivalInfos": tf["arrivalInfos"]
-                    }
-                ]
+                "results": [ stats_result ] # Redis에서 가져온 걸 여기에 쏙!
             })
 
         # 3. End Station 구조 조립
@@ -144,7 +174,7 @@ class SubwayHelper:
             "boardingProbability": probability,
             
             "startStation": start_station_payload,
-            "transferStation": transfer_station_payload,
+            "transferStation": transfer_payload,
             "endStation": end_station_payload
         }
 
