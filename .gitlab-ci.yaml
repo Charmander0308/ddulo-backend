@@ -1,0 +1,18 @@
+stages:
+  - deploy
+
+deploy_job:
+  stage: deploy
+  tags:
+    - ec2
+  only:
+    - be/develop    # 'be/develop' 브랜치일 때만 실행
+  script:
+    - echo "EC2 Runner가 배포를 시작합니다"
+
+    # 프로젝트 폴더로 이동
+    - cd /home/a204/home/ddulo/S14P11A204/ddulo-api
+
+    # 배포 스크립트 실행
+    # (이미 서버 안에 있는 스크립트를 실행만 시킴)
+    - ./deploy.sh
