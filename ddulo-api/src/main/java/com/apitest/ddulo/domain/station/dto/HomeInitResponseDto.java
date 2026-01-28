@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @Schema(description = "사용자 위치반경 내 역 데이터 DTO")
 public class HomeInitResponseDto {
-    @Schema(description = "내 주변 1km 이내 역 목록")
+    @Schema(description = "역 목록")
     private List<StationDto> nearbyStations;  // 내 주변 1km 이내 역 (추천용, 상단 노출)
     @Schema(description = "전체 역 목록")
     private List<StationDto> allStations;   // 전체 역 리스트 (검색용, 로컬 DB 캐싱용)
