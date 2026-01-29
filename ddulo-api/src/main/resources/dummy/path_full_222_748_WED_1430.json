@@ -14,9 +14,9 @@
       "stationName": "강남",
       "lineName": "2호선",
       "direction": 1,
-      "estimatedWatingSec": 240,
+      "estimatedWaitingSec": 240,
       "isBoardable": false,
-      "result": [
+      "results": [
         {
           "carCongestions": [
             {
@@ -500,18 +500,18 @@
       "stationName": "강남",
       "lineName": "2호선",
       "direction": 1,
-      "estimatedWatingSec": 540,
+      "estimatedWaitingSec": 540,
       "isBoardable": true,
-      "result": []
+      "results": []
     },
     {
       "stationId": 222,
       "stationName": "강남",
       "lineName": "2호선",
       "direction": 1,
-      "estimatedWatingSec": 840,
+      "estimatedWaitingSec": 840,
       "isBoardable": true,
-      "result": []
+      "results": []
     }
   ],
   "transferStation": [
@@ -522,7 +522,7 @@
           "stationName": "대림",
           "lineName": "7호선",
           "direction": 1,
-          "estimatedWatingSec": 240,
+          "estimatedWaitingSec": 240,
           "isBoardable": false,
           "results": [
             {
@@ -791,13 +791,13 @@
           "stationId": 233,
           "stationName": "대림",
           "lineName": "7호선",
-          "result": []
+          "results": []
         },
         {
           "stationId": 233,
           "stationName": "대림",
           "lineName": "7호선",
-          "result": []
+          "results": []
         }
       ]
     }
@@ -807,7 +807,7 @@
     "stationName": "광명사거리",
     "lineName": "7호선",
     "NextStationName": null,
-    "estimatedWatingSec": 0,
-    "result": []
+    "estimatedWaitingSec": 0,
+    "results": []
   }
 }
