@@ -21,6 +21,7 @@ GATE_AREAS = {
 # 기준 값
 STD_DENSITY = 4.3   # 면적당 기준 인원 (명/m^2)
 TRAIN_CAPACITY = 160 # 열차 1량당 기준 인원 (명)
+THRESHOLD_CONGESTION = 100.0 # 혼잡도 임계치 (%)
 
 class CongestionSystem:
     def __init__(self):
@@ -67,7 +68,7 @@ class CongestionSystem:
         try:
             payload = msg.payload.decode('utf-8')
             data = json.loads(payload)
-            
+
             # 데이터 포맷에 따라 분기 (여기서는 Dict 형태 {gate: count} 가정)
             for gate, count in data.items():
                 if gate in self.platform_counts:
@@ -174,7 +175,7 @@ class CongestionSystem:
                 off_rate = get_off_rates[i] if i < len(get_off_rates) else 0
                 
                 # C. 승강장 대기 인원 (해당 칸 게이트가 없으면 0)
-                
+
                 platform_cnt = self.platform_counts.get(gate_key, 0)
                 
                 # D. 종합 혼잡도 공식 적용
@@ -184,7 +185,7 @@ class CongestionSystem:
                 term2 = platform_cnt * (100.0 / TRAIN_CAPACITY)
                 total_congestion = term1 + term2
                 
-                if total_congestion < 100:
+                if total_congestion < THRESHOLD_CONGESTION:
                     isBoardable = True
 
                 final_results.append({
@@ -193,7 +194,8 @@ class CongestionSystem:
                     "trainCongestion": current_train_cong,
                     "getOffRate": off_rate,
                     "platformCount": platform_cnt,
-                    "congestionLevel": round(total_congestion, 2)
+                    "congestionLevel": round(total_congestion, 2),
+                    "isBoardable" : isBoardable
                 })
                 
 
@@ -222,7 +224,6 @@ if __name__ == "__main__":
 
     # 2. 종합 혼잡도 계산 요청 (CSV 파일이 실제 존재해야 동작)
     # 예시 입력값: day='MON', time='08:00', station='Gangnam', direction='Up'
-    # 실제 CSV 데이터 값에 맞춰 파라미터 전달 필요
     total_result = system.get_total_congestion('MON', '18:00', 222, 1)
 
     if total_result:
@@ -232,7 +233,7 @@ if __name__ == "__main__":
         for res in total_result[:4]: # 게이트가 있는 4개 칸만 출력 예시
             print(f"{res['carNo']:<5} {res['trainCongestion']:<10} {res['getOffRate']:<10} {res['platformCount']:<10} {res['congestionLevel']:<10}")
     else:
-        print("\n[Info] CSV 파일이 없거나 매칭되는 데이터가 없어 종합 결과를 출력할 수 없습니다.")
+        print("\n[Info] 매칭되는 데이터가 없어 종합 결과를 출력할 수 없습니다.")
     
     # MQTT 수신 대기를 위해 유지 (실제 운영 시)
     while True:
