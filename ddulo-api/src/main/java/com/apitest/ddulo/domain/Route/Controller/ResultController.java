@@ -1,11 +1,10 @@
-package com.apitest.ddulo.domain.Route.Controller;
+package com.apitest.ddulo.domain.route.controller;
 
-import com.apitest.ddulo.domain.Route.Service.ResultService;
-import com.apitest.ddulo.domain.Route.dto.ResultRequest;
-import com.apitest.ddulo.domain.Route.dto.ResultResponse;
+import com.apitest.ddulo.domain.route.service.ResultService;
+import com.apitest.ddulo.domain.route.dto.ResultRequest;
+import com.apitest.ddulo.domain.route.dto.ResultResponse;
 import com.apitest.ddulo.global.common.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;

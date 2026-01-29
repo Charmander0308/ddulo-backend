@@ -1,4 +1,4 @@
-package com.apitest.ddulo.domain.Route.dto;
+package com.apitest.ddulo.domain.route.dto;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -25,6 +25,7 @@ public class ResultResponse {
         private String lineName;    // 노선명
         private String nextStationName;     //다음 역 명
         private Integer estimatedWatingSec; //예상 대기시간(초)
+        private Boolean isBoardable;    //탑승 가능 여부
 
         private List<ResultInfo> results;    //결과
     }

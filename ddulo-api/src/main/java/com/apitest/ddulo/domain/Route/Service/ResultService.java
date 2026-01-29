@@ -1,7 +1,7 @@
-package com.apitest.ddulo.domain.Route.Service;
+package com.apitest.ddulo.domain.route.service;
 
-import com.apitest.ddulo.domain.Route.dto.ResultRequest;
-import com.apitest.ddulo.domain.Route.dto.ResultResponse;
+import com.apitest.ddulo.domain.route.dto.ResultRequest;
+import com.apitest.ddulo.domain.route.dto.ResultResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
