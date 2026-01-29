@@ -53,6 +53,7 @@ public class PathFullResponse {
         private String lineName;    //노선명
         private int direction;      //운행방향(0:상행/외선, 1:하행/내선)
         private int estimatedWaitingSec;    //(열차 도착까지)예상 대기시간
+
         // JSON 키는 "isBoardable"이지만, 자바 필드명은 boardable로 하고 매핑을 명시
         // (Lombok getter 생성 시 혼동 방지)
         @JsonProperty("isBoardable")
@@ -71,7 +72,6 @@ public class PathFullResponse {
         private List<DoorCongestion> totalCongestions;  //역 + 열차 종합 혼잡도
         private List<BoardingSpot> bestBoardings;    //베스트탑승 위치
         private List<BoardingSpot> comfortBoarding; //쾌적한탑승 위치
-        private List<ArrivalInfo> arrivalInfos;     //도착하는 열차들의 정보
     }
 
     @Data
@@ -97,15 +97,5 @@ public class PathFullResponse {
     public static class BoardingSpot {
         private int carNo;  //객차번호
         private int doorNo; //문번호
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ArrivalInfo {
-        private String direction;   //운행방향(0:상행/외선, 1:하행/내선)
-        private int arrivalSec;     // 도착까지 걸리는 시간
-        private String currentStation;  //현재역
-        private String destination;     //종착역
     }
 }

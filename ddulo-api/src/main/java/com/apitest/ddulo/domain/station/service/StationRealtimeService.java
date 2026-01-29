@@ -1,6 +1,9 @@
 package com.apitest.ddulo.domain.station.service;
 
+import com.apitest.ddulo.domain.path.dto.response.PathPredictionResponse;
+import com.apitest.ddulo.domain.path.service.PathService;
 import com.apitest.ddulo.domain.station.dto.StationArrivalResponse;
+import com.apitest.ddulo.domain.station.dto.StationDetailResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,9 +16,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StationRealtimeService {
 
+    private final StationService stationService;
+    private final PathService pathService;
+
     @Transactional
     public StationArrivalResponse getRealtimeStationDetail(Long stationId) {
         return sample(stationId);
+
+//        StationDetailResponse stationDetailResponse = stationService.getStationDetail(stationId);
+//        PathPredictionResponse pathPredictionResponse = pathService.getPathPrediction(
+//
+//        return null;
     }
 
     private StationArrivalResponse sample(Long stationId){

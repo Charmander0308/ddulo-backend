@@ -483,14 +483,6 @@
               "carNo": 5,
               "doorNo": 2
             }
-          ],
-          "arrivalInfos": [
-            {
-              "direction": "1",
-              "arrivalSec": 120,
-              "currentStation": "역삼",
-              "destination": "신도림"
-            }
           ]
         }
       ]
@@ -775,14 +767,6 @@
                   "carNo": 8,
                   "doorNo": 2
                 }
-              ],
-              "arrivalInfos": [
-                {
-                  "direction": "온수행",
-                  "arrivalSec": 100,
-                  "currentStation": "신풍",
-                  "destination": "부평구청"
-                }
               ]
             }
           ]
@@ -791,12 +775,18 @@
           "stationId": 233,
           "stationName": "대림",
           "lineName": "7호선",
+          "direction": 1,
+          "estimatedWaitingSec": 540,
+          "isBoardable": true,
           "results": []
         },
         {
           "stationId": 233,
           "stationName": "대림",
           "lineName": "7호선",
+          "direction": 1,
+          "estimatedWaitingSec": 840,
+          "isBoardable": true,
           "results": []
         }
       ]
