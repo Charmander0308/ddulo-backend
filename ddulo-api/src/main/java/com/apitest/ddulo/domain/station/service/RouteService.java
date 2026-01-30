@@ -20,7 +20,7 @@ public class RouteService {
 
     public RouteResponse getSubwayRoute(String startStation, String endStation) {
         // 외부 API 데이터 조회
-        SeoulApiDto rawData = routeApiClient.searchRoute(startStation, endStation);
+        SeoulApiDto rawData = routeApiClient.searchRoute(removeStationSuffix(startStation), removeStationSuffix(endStation));
 
         // 데이터 검증 (Null Check)
         if (rawData == null || rawData.getBody() == null || rawData.getBody().getPaths() == null) {
@@ -88,10 +88,20 @@ public class RouteService {
     // 리스트 추가 헬퍼 메서드
     private void addLeg(List<RouteResponse.RouteLeg> legs, String start, String end, String line, int time) {
         legs.add(RouteResponse.RouteLeg.builder()
-                .startStation(start)
-                .endStation(end)
+                .startStation(addStationSuffix(start))
+                .endStation(addStationSuffix(end))
                 .lineName(line)
                 .sectionTime(time)
                 .build());
+    }
+
+    // '역' 접미사 제거
+    private String removeStationSuffix(String stationName) {
+        return stationName.endsWith("역") ? stationName.substring(0, stationName.length() - 1) : stationName;
+    }
+
+    // '역' 접미사 추가
+    private String addStationSuffix(String stationName) {
+        return stationName.endsWith("역") ? stationName : stationName + "역";
     }
 }
