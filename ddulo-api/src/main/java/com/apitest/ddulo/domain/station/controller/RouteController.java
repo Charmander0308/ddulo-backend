@@ -23,8 +23,8 @@ public class RouteController {
     @GetMapping
     @Operation(summary = "최단시간 경로 조회", description = "출발지에서 도착지까지의 최단시간 경로를 조회할 수 있다.")
     public ApiResponse<RouteResponse> searchRoute(
-            @RequestParam("from") @Parameter(description = "출발역", example = "역삼") String fromStation,
-            @RequestParam("to") @Parameter(description = "도착역", example = "광명사거리") String toStation
+            @RequestParam("from") @Parameter(description = "출발역", example = "역삼역") String fromStation,
+            @RequestParam("to") @Parameter(description = "도착역", example = "광명사거리역") String toStation
     ) {
         RouteResponse response = routeService.getSubwayRoute(fromStation, toStation);
         return ApiResponse.success(response);
