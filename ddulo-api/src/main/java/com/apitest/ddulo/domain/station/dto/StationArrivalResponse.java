@@ -28,9 +28,9 @@ public class StationArrivalResponse {
         @Schema(description = "노선명", example = "2호선")
         private String lineName;    // 노선명
         @Schema(description = "이전 역 명", example = "선릉역")
-        private String prevStationName;     //이전 역 명
+        private List<String> prevStationName;     //이전 역 명
         @Schema(description = "다음 역 명", example = "강남역")
-        private String nextStationName;     //다음 역 명
+        private List<String> nextStationName;     //다음 역 명
     }
 
     @Getter
