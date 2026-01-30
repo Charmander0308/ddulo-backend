@@ -12,6 +12,8 @@ import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.Locale;
 
+import static com.apitest.ddulo.global.utils.DateUtils.convertDateToDayKey;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -54,12 +56,4 @@ public class PathService {
         }
     }
 
-    // Util: 2026-01-28 -> WED 로 변환하는 메서드
-    private String convertDateToDayKey(String dateStr) {
-        LocalDate date = LocalDate.parse(dateStr); // YYYY-MM-DD
-        // 요일을 영어 약어(WED, MON 등)로 변환
-        return date.getDayOfWeek()
-                .getDisplayName(TextStyle.SHORT, Locale.ENGLISH)
-                .toUpperCase();
-    }
 }

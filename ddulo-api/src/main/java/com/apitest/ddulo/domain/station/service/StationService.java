@@ -13,6 +13,9 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.Locale;
 
+import static com.apitest.ddulo.global.utils.DateUtils.convertDateToDayKey;
+import static com.apitest.ddulo.global.utils.DateUtils.getCurrentTimeKey;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -21,6 +24,7 @@ public class StationService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
 
+    // Redis에서 역 상세정보(양 방향으로 인접한 열차 상태 3개씩 조회) 조회
     public StationDetailResponse getStationDetail(Long stationId) {
         // Redis Key 생성: stat:near:{stationId}:{요일}:{시간}
         String redisKey = String.format(
@@ -32,37 +36,13 @@ public class StationService {
 
         Object rawData = redisTemplate.opsForValue().get(redisKey);
 
-        if (rawData == null) return null;
+        if (rawData == null) return null;   // 예외처리 로직 추가하기
 
         try {
             return objectMapper.readValue(rawData.toString(), StationDetailResponse.class);
         } catch (Exception e) {
-            throw new RuntimeException("데이터 변환 실패");
+            throw new RuntimeException("데이터 변환 실패");    // 커스텀 예외처리 로직 추가하기
         }
     }
 
-    // Util: 2026-01-28 -> WED 로 변환하는 메서드
-    private String convertDateToDayKey(String dateStr) {
-        LocalDate date = LocalDate.parse(dateStr);
-        return date.getDayOfWeek()
-                .getDisplayName(TextStyle.SHORT, Locale.ENGLISH)
-                .toUpperCase();
-    }
-
-    // Util: 10분 간격으로 내림 처리하는 메서드
-    private String getCurrentTimeKey() {
-        LocalTime now = LocalTime.now();
-
-        // 10분 단위로 내림 (Floor) 계산
-        // ex: 47분 -> 40분, 03분 -> 00분
-        int minute = now.getMinute();
-        int roundedMinute = (minute / 10) * 10;
-
-        // 시간을 다시 설정 (초는 00으로)
-        LocalTime targetTime = now.withMinute(roundedMinute).withSecond(0).withNano(0);
-
-        // Redis 키 형식(HHmm)으로 변환
-        // 예: 14:30:00 -> "1430"
-        return targetTime.format(DateTimeFormatter.ofPattern("HHmm"));
-    }
 }
