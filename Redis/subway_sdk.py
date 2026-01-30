@@ -57,24 +57,76 @@ class SubwayHelper:
 
     def get_current_platform_data(self):
         return self.mqtt_data
+    
+    def get_platform_area(self, station_id, direction):
+        """
+        Redis Key: platformArea:{station_id}:{direction}
+        내용:
+            [
+             [50.0, 40.0, 50.0, 40.0],  # 1호차
+             [50.0, 40.0, 50.0, 40.0],  # 2호차
+             ...
+            ]
+        """
+        key = f"platformArea:{station_id}:{direction}"
+        data = self.redis.get(key)
+        if data:
+            data = json.loads(data)
+            return data
+        else:
+            print(f"⚠️ [SDK] 승강장 면적 데이터 없음: {key}")
+            return []
+    
+    def get_statistical_data(self, station_id, time_slot, day_of_week, direction):
+        """
+        Redis Key: stats:{day_of_week}:{station_id}:{direction}:{time_slot} (예: stats:MON:233:1:1430)
+        """
+        key = f"stats:{day_of_week}:{station_id}:{direction}:{time_slot}"
+        data = self.redis.get(key)
+        if data:
+            data = json.loads(data)
+            return data
+        else:
+            print(f"⚠️ [SDK] 통계 데이터 없음: {key}")
+            return {}
+
 
     # =================================================================
     # [Step 1] 통계 데이터 적재용 (알고리즘 팀이 미리 돌리는 함수)
     # =================================================================
-    def save_statistical_data(self, station_id, time_slot, car, station, total, best, comfort):
+    def save_platform_area(self, station_id, direction, platform_area):
         """
-        Redis Key: stats:{station_id}:{time_slot} (예: stats:233:14:30)
+        Redis Key: platformArea:{station_id}:{direction}
+        내용:
+            [
+             [50.0, 40.0, 50.0, 40.0],  # 1호차
+             [50.0, 40.0, 50.0, 40.0],  # 2호차
+             ...
+            ]
+        """
+        key = f"platformArea:{station_id}:{direction}"
+        self.redis.set(key, json.dumps(platform_area, ensure_ascii=False))
+        print(f"💾 [Pre-Load] 승강장 면적 데이터 적재 완료: {key}")
+
+    def save_statistical_data(self, station_id, time_slot, day_of_week, direction, car, station, total, off_rate, is_boardable, comfort_boarding):
+        """
+        Redis Key: stats:{day_of_week}:{station_id}:{direction}:{time_slot} (예: stats:MON:233:1:1430)
         내용: 환승역 미래 예측 데이터 알맹이
         """
         payload = {
+            # "stationCode": station_id,
+            # "day_of_week" : day_of_week,
+            # "direction" : direction,
             "carCongestions": car,
             "stationCongestions": station,
             "totalCongestions": total,
-            "bestBoardings": best,
-            "comfortBoarding": comfort,
+            "offRates": off_rate,
+            "isBoardable": is_boardable,
+            "comfortBoarding": comfort_boarding,
+            "bestBoarding": [],
             "arrivalInfos": [] # 통계니까 도착정보는 없음
         }
-        key = f"stats:{station_id}:{time_slot}"
+        key = f"stats:{day_of_week}:{station_id}:{direction}:{time_slot}"
         
         # 영구 저장 (나중에 갱신 전까지 유지)
         self.redis.set(key, json.dumps(payload, ensure_ascii=False))
@@ -85,15 +137,10 @@ class SubwayHelper:
     # 🔥 [핵심] 전체 JSON을 통째로 조립해서 저장하는 함수
     # =================================================================
     def save_full_route_json(self, 
-                             redis_key,           # 저장할 Key (예: route:222:748)
-                             
-                             # 1. 전체 요약 정보
-                             total_time, 
-                             estimated_time, 
-                             probability,
+                             redis_key,           # 저장할 Key path:full:{출발Id}:{도착ID}:{요일}:{시간}
                              
                              # 2. 출발역 정보 (메타 + 알고리즘 결과)
-                             start_station_data,
+                             start_station_datas,
                              
                              # 3. 환승역 정보 리스트 (메타 + 알고리즘 결과의 리스트)
                              transfer_stations_meta,
@@ -108,71 +155,64 @@ class SubwayHelper:
         """
 
         # 1. Start Station 구조 조립
-        start_station_payload = {
-        "stationId": start_station_data["stationId"], # 꼭 채워줘야함!!!!!
-            "stationName": start_station_data["stationName"],
-            "lineName": start_station_data["lineName"],
-            "direction": start_station_data["direction"], # 꼭 채워줘야함!!!!!
-            "estimatedWatingSec": start_station_data["estimatedWatingSec"],
-            "result": [
-                {
-                    # 알고리즘으로 구한 값들 (SDK 호출 시 넘겨줘야 함)
-                    "carCongestions": start_station_data["carCongestions"],
-                    "stationCongestions": start_station_data["stationCongestions"],
-                    "totalCongestions": start_station_data["totalCongestions"],
-                    "bestBoardings": start_station_data["bestBoardings"],
-                    "comfortBoarding": start_station_data["comfortBoarding"],
-                    "arrivalInfos": start_station_data["arrivalInfos"]
-                }
-            ]
-        }
+        start_station_payload = []
+        for start_station_data in start_station_datas:
+            start_station_info = {
+                "stationId": start_station_data["stationId"], # 꼭 채워줘야함!!!!!
+                "stationName": start_station_data.get("stationName", ""),
+                "lineName": start_station_data.get("lineName", ""),
+                "direction": start_station_data["direction"], # 꼭 채워줘야함!!!!!
+                "estimatedWatingSec": start_station_data.get("estimatedWatingSec", 0),
+                "result": [
+                    {
+                        "carCongestions": start_station_data["carCongestions"],
+                        "stationCongestions": start_station_data["stationCongestions"],
+                        "totalCongestions": start_station_data["totalCongestions"],
+                        "bestBoardings": start_station_data["bestBoardings"],
+                        "comfortBoarding": start_station_data["comfortBoarding"],
+                    }
+                ] if "carCongestions" in start_station_data else []
+            }
+            start_station_payload.append(start_station_info)
 
-        # 2. Transfer Station (핵심: Redis 체이닝)
+
+        # 2. Transfer Station
         transfer_payload = []
         
         for tf in transfer_stations_meta:
-            # (1) 메타 정보에서 ID와 시간 꺼내기
-            tf_id = tf["stationId"]
-            tf_time = tf["timeSlot"] # 예: "14:30" (이 시간에 도착한다는 뜻)
-            
-            # (2) 미리 박아둔 통계 데이터 조회 (Chain)
-            stats_key = f"stats:{tf_id}:{tf_time}"
-            cached_data = self.redis.get(stats_key)
-            
-            # (3) 데이터가 있으면 파싱, 없으면 빈 껍데기
-            if cached_data:
-                stats_result = json.loads(cached_data)
-                print(f"🔗 [Chain] 환승역({tf_id}) 데이터 병합 성공 (Time: {tf_time})")
-            else:
-                print(f"⚠️ [Chain] 환승역({tf_id}) 데이터 없음! Key: {stats_key}")
-                stats_result = {} # 비어있으면 프론트에서 터질 수 있으니 주의
-
-            # (4) 환승역 최종 조립
-            transfer_payload.append({
-                "stationId": tf_id,
-                "stationName": tf["stationName"],
-                "lineName": tf["lineName"],
-                "direction": tf["direction"],
-                "estimatedWatingSec": tf["estimatedWatingSec"],
-                "results": [ stats_result ] # Redis에서 가져온 걸 여기에 쏙!
-            })
+            stations = []
+            for station in tf:
+                stations.append({
+                    "stationId": station["stationId"],
+                    "stationName": station.get("stationName", ""),
+                    "lineName": station.get("lineName", ""),
+                    "direction": station["direction"],
+                    "estimatedWaitingSec": station.get("estimatedWaitingSec", 0),
+                    "results": [ 
+                        {
+                            "carCongestions": station["carCongestions"],
+                            "stationCongestions": station["stationCongestions"],
+                            "totalCongestions": station["totalCongestions"],
+                            "bestBoardings": station["bestBoardings"],
+                            "comfortBoarding": station["comfortBoarding"],
+                        }
+                    ] if "carCongestions" in station else []
+                })
+            transfer_payload.append({"stations": stations})
+        
 
         # 3. End Station 구조 조립
         end_station_payload = {
             "stationId": end_station_data["stationId"],
-            "stationName": end_station_data["stationName"],
-            "lineName": end_station_data["lineName"],
+            "stationName": end_station_data.get("stationName", ""),
+            "lineName": end_station_data.get("lineName", ""),
             "NextStationName": end_station_data.get("NextStationName", None),
-            "estimatedWatingSec": end_station_data.get("estimatedWatingSec", 0),
+            "estimatedWaitingSec": end_station_data.get("estimatedWaitingSec", 0),
             "results": []
         }
 
         # 4. 최종 JSON 완성 (형이 준 구조 그대로)
         final_payload = {
-            "totalTimeSecond": total_time,
-            "estimatedBoardingTime": estimated_time, # 예: "2026-01-28T14:30:00"
-            "boardingProbability": probability,
-            
             "startStation": start_station_payload,
             "transferStation": transfer_payload,
             "endStation": end_station_payload
