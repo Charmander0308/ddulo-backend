@@ -21,16 +21,16 @@ public class StationArrivalResponse {
     @Builder
     @Schema(description = "역 기본정보")
     public static class StationInfo {
-        @Schema(description = "역 ID", example = "221")
-        private Long stationId; // 역 ID(pk)
+        @Schema(description = "역 코드", example = "221")
+        private String stationCode; // 역 ID(pk)
         @Schema(description = "역 이름", example = "역삼역")
         private String stationName;     // 역명
         @Schema(description = "노선명", example = "2호선")
         private String lineName;    // 노선명
         @Schema(description = "이전 역 명", example = "선릉역")
-        private List<String> prevStationName;     //이전 역 명
+        private List<StationNode> prevStations;     //이전 역 명
         @Schema(description = "다음 역 명", example = "강남역")
-        private List<String> nextStationName;     //다음 역 명
+        private List<StationNode> nextStations;     //다음 역 명
     }
 
     @Getter

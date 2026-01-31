@@ -36,4 +36,21 @@ public class DateUtils {
         // 예: 14:30:00 -> "1430"
         return targetTime.format(DateTimeFormatter.ofPattern("HHmm"));
     }
+
+    // Util: 시간을 10분 간격으로 올림 처리하는 메서드(ex: 14:37:21 -> "1440")
+    public static String getNextTimeKey() {
+        LocalTime now = LocalTime.now();
+
+        // 현재 기준 '내림' 분 계산 (이미 있는 로직)
+        int minute = now.getMinute();
+        int roundedMinute = (minute / 10) * 10;
+
+        // 현재 구간의 시작 시간으로 설정 (ex: 14:32 -> 14:30:00)
+        LocalTime currentBucketTime = now.withMinute(roundedMinute).withSecond(0).withNano(0);
+
+        // 10분을 더함 (LocalTime이 알아서 59분 넘어가면 시단위 올려줌)
+        LocalTime nextBucketTime = currentBucketTime.plusMinutes(10);
+
+        return nextBucketTime.format(DateTimeFormatter.ofPattern("HHmm"));
+    }
 }

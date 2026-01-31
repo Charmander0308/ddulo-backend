@@ -1,7 +1,13 @@
 package com.apitest.ddulo.domain.station.service;
 
+import com.apitest.ddulo.domain.station.dto.StationAdjacencyResult;
 import com.apitest.ddulo.domain.station.dto.StationArrivalResponse;
 import com.apitest.ddulo.domain.station.dto.StationDetailResponse;
+import com.apitest.ddulo.domain.station.dto.StationNode;
+import com.apitest.ddulo.domain.station.repository.StationRepository;
+import com.apitest.ddulo.global.exception.CustomException;
+import com.apitest.ddulo.global.exception.ErrorCode;
+import com.apitest.ddulo.global.utils.SubwayUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,70 +21,70 @@ import java.util.List;
 public class StationRealtimeService {
 
     private final StationService stationService;
+    private final StationAdjacencyService stationAdjacencyService;
+    private final StationRepository stationRepository;
 
-    @Transactional
-    public StationArrivalResponse getRealtimeStationDetail(Long stationId) {
-//        return sample(stationId);
-        StationDetailResponse stationDetailResponse = stationService.getStationDetail(stationId);
-        //stationDetailResponse로 얻은 데이터를 StationArrivalResponse의 형태에 맞게 정제해주는 로직 필요
-        return null;
+    @Transactional(readOnly = true)
+    public StationArrivalResponse getRealtimeStationDetail(String stationCode) {
+        //없는 역코드면 예외처리
+        if(!stationRepository.existsByStationCode(stationCode))
+            throw new CustomException(ErrorCode.STATION_NOT_FOUND);
+        //redis에서 실시간 역/열차 정보 조회
+        StationDetailResponse stationDetailResponse = stationService.getStationDetail(stationCode);
+        //데이터가 없는 경우 예외처리
+        if(stationDetailResponse == null) throw new CustomException(ErrorCode.DATA_NOT_FOUND);
+        //인접 역 리스트 조회
+        StationAdjacencyResult nearStations = stationAdjacencyService.getAdjacentStations(stationCode);
+        //인접 역이 모두 없는 경우 예외처리
+        if(nearStations.getPrevStations().isEmpty() && nearStations.getNextStations().isEmpty())
+            throw new CustomException(ErrorCode.DATA_NOT_FOUND);
+
+        return buildStationArrivalResponse(stationDetailResponse, nearStations);
     }
 
-    private StationArrivalResponse sample(Long stationId){
-        List<StationArrivalResponse.ArrivalInfo> upBoundList = List.of(
-                StationArrivalResponse.ArrivalInfo.builder()
-                        .direction("성수(내선)행")
-                        .arrivalSec(155)
-                        .currentStation("역삼역")
-                        .destination("성수역")
-                        .isBoardable(true)
-                        .carCongestions(List.of(
-                                StationArrivalResponse.CarCongestion.builder().carNo(1).congestionLevel(0).build(),
-                                StationArrivalResponse.CarCongestion.builder().carNo(2).congestionLevel(10).build(),
-                                StationArrivalResponse.CarCongestion.builder().carNo(3).congestionLevel(20).build(),
-                                StationArrivalResponse.CarCongestion.builder().carNo(4).congestionLevel(30).build(),
-                                StationArrivalResponse.CarCongestion.builder().carNo(5).congestionLevel(40).build(),
-                                StationArrivalResponse.CarCongestion.builder().carNo(6).congestionLevel(60).build(),
-                                StationArrivalResponse.CarCongestion.builder().carNo(7).congestionLevel(70).build(),
-                                StationArrivalResponse.CarCongestion.builder().carNo(8).congestionLevel(80).build(),
-                                StationArrivalResponse.CarCongestion.builder().carNo(9).congestionLevel(90).build(),
-                                StationArrivalResponse.CarCongestion.builder().carNo(10).congestionLevel(100).build()
-                        ))
-                        .build()
-        );
-        List<StationArrivalResponse.ArrivalInfo> downBoundList = List.of(
-                StationArrivalResponse.ArrivalInfo.builder()
-                        .direction("신도림(외선)행")
-                        .arrivalSec(210)
-                        .currentStation("교대역")
-                        .destination("신도림역")
-                        .isBoardable(false)
-                        .carCongestions(List.of(
-                                StationArrivalResponse.CarCongestion.builder().carNo(1).congestionLevel(100).build(),
-                                StationArrivalResponse.CarCongestion.builder().carNo(2).congestionLevel(90).build(),
-                                StationArrivalResponse.CarCongestion.builder().carNo(3).congestionLevel(80).build(),
-                                StationArrivalResponse.CarCongestion.builder().carNo(4).congestionLevel(70).build(),
-                                StationArrivalResponse.CarCongestion.builder().carNo(5).congestionLevel(60).build(),
-                                StationArrivalResponse.CarCongestion.builder().carNo(6).congestionLevel(40).build(),
-                                StationArrivalResponse.CarCongestion.builder().carNo(7).congestionLevel(30).build(),
-                                StationArrivalResponse.CarCongestion.builder().carNo(8).congestionLevel(20).build(),
-                                StationArrivalResponse.CarCongestion.builder().carNo(9).congestionLevel(10).build(),
-                                StationArrivalResponse.CarCongestion.builder().carNo(10).congestionLevel(0).build()
-                        ))
-                        .build()
-        );
+    //데이터를 정제해서 프론트엔드로 넘기는 dto를 생성
+    private StationArrivalResponse buildStationArrivalResponse(
+            StationDetailResponse stationDetailResponse,
+            StationAdjacencyResult nearStations) {
+
+        var station = stationDetailResponse.getStation();
+        String lineName = station.getLineName();
 
         return StationArrivalResponse.builder()
                 .station(StationArrivalResponse.StationInfo.builder()
-                        .stationId(stationId)
-                        .stationName("강남역")
-                        .lineName("2호선")
-                        .prevStationName(List.of("역삼역", "선릉역"))
-                        .nextStationName(List.of("교대역", "서초역"))
+                        .stationCode(station.getStationId())
+                        .stationName(station.getStationName())
+                        .lineName(lineName)
+                        .prevStations(nearStations.getPrevStations())
+                        .nextStations(nearStations.getNextStations())
                         .build())
-                .upBound(upBoundList)
-                .downBound(downBoundList)
+                .upBound(stationDetailResponse.getUpBound().stream()
+                        .map(arrival -> mapToArrivalInfo(arrival, lineName))
+                        .toList())
+                .downBound(stationDetailResponse.getDownBound().stream()
+                        .map(arrival -> mapToArrivalInfo(arrival, lineName))
+                        .toList())
                 .build();
     }
 
+    //열차 실시간 데이터 리스트 담는 메서드
+    private StationArrivalResponse.ArrivalInfo mapToArrivalInfo(
+            StationDetailResponse.TrainArrival arrival,
+            String lineName) {
+
+        return StationArrivalResponse.ArrivalInfo.builder()
+                .direction(SubwayUtils.getDirectionName(arrival.getDirection(), lineName))
+                .arrivalSec(arrival.getArrivalSec())
+                .currentStation(arrival.getCurrentStation())
+                .destination(arrival.getDestination())
+                .isBoardable(arrival.isBoardable())
+
+                .carCongestions(arrival.getCarCongestions().stream()
+                        .map(congestion -> StationArrivalResponse.CarCongestion.builder()
+                                .carNo(congestion.getCarNo())
+                                .congestionLevel(congestion.getCongestionLevel())
+                                .build())
+                        .toList())
+                .build();
+    }
 }

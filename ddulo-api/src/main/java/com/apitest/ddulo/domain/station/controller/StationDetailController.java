@@ -21,22 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class StationDetailController {
 
     private final StationRealtimeService stationRealtimeService;
-    private final StationService stationService;
 
-    //테스트용
-    @GetMapping("/{station_id}")
-    @Operation(summary = "역 상세정보 조회", description = "역 ID를 통해 해당 역의 상세정보를 조회할 수 있다.")
+    @GetMapping("/{station_code}")
+    @Operation(summary = "역 상세정보 조회", description = "역 코드를 통해 해당 역의 상세정보를 조회할 수 있다.")
     public ApiResponse<StationArrivalResponse> stationDetailInfo(
-            @PathVariable("station_id") @Parameter(description = "역 ID", example = "221") Long stationId) {
-        return ApiResponse.success(stationRealtimeService.getRealtimeStationDetail(stationId));
+            @PathVariable("station_code") @Parameter(description = "역 코드", example = "221") String stationCode) {
+        return ApiResponse.success(stationRealtimeService.getRealtimeStationDetail(stationCode));
     }
-
-    //실제 사용되는 컨트롤러는 이것
-//    @GetMapping("/{station_id}")
-//    @Operation(summary = "역 상세정보 조회", description = "역 ID를 통해 해당 역의 상세정보를 조회할 수 있다.")
-//    public ApiResponse<StationDetailResponse> stationDetailInfo(
-//            @PathVariable("station_id") @Parameter(description = "역 ID", example = "221") Long stationId) {
-//        return ApiResponse.success(stationService.getStationDetail(stationId));
-//    }
-
 }

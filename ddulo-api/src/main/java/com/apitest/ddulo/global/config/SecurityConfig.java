@@ -24,6 +24,7 @@ public class SecurityConfig {
 
 				// 인증/인가 설정 (모두 허용)
 				.authorizeHttpRequests(auth -> auth
+						.requestMatchers("/login", "/error").permitAll()
 						.anyRequest().permitAll()
 				)
 

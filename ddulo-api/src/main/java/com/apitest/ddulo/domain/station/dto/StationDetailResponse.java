@@ -35,7 +35,7 @@ public class StationDetailResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class StationInfo {
-        private int stationId;      //역 ID
+        private String stationId;   //역 ID(역 코드임)
         private String stationName; //역 이름
         private String lineName;    //노선명
     }

@@ -6,7 +6,7 @@
     "redisKey": "stat:near:221:WED:1430"
   },
   "station": {
-    "stationId": 221,
+    "stationId": "221",
     "stationName": "역삼",
     "lineName": "2호선"
   },
@@ -71,7 +71,7 @@
   ],
   "downBound": [
     {
-      "direction": 2,
+      "direction": 0,
       "arrivalSec": 150,
       "currentStation": "강남",
       "destination": "성수",
@@ -90,7 +90,7 @@
       ]
     },
     {
-      "direction": 2,
+      "direction": 0,
       "arrivalSec": 300,
       "currentStation": "교대",
       "destination": "성수",
@@ -109,7 +109,7 @@
       ]
     },
     {
-      "direction": 2,
+      "direction": 0,
       "arrivalSec": 450,
       "currentStation": "서초",
       "destination": "성수",
