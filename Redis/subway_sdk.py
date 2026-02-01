@@ -1,5 +1,6 @@
 import json
 import threading
+from turtle import right
 import paho.mqtt.client as mqtt
 import os
 from dotenv import load_dotenv
@@ -303,29 +304,47 @@ class SubwayHelper:
     # =================================================================
     # 🔥 [DataSet 2] 실시간 전광판용 (인접 열차 3개 + 탑승가능여부)
     # =================================================================
-    def save_for_station_board(self, station_info, up_bound_list, down_bound_list):
+    def save_for_station_board(self, redis_key, station_id, up_bound, down_bound):
         """
         :param station_info: { "stationId": 221, "stationName": "역삼역", "lineName": "2호선" }
         :param up_bound_list: 상행선 열차 정보 리스트 (최대 3개)
         :param down_bound_list: 하행선 열차 정보 리스트 (최대 3개)
         """
+        context = {"redisKey": redis_key}
+        station = {"stationId":station_id}
+        upbound = []
+        downbound = []
+
+        for left in down_bound:
+            result = {}
+            result["direction"] = 0
+            result["isBoardable"] = left["isBoardable"]
+            result["carCongestions"] = left["carCongestions"]
+            downbound.append(result)
+        
+        for right in up_bound:
+            result = {}
+            result["direction"] = 1
+            result["isBoardable"] = right["isBoardable"]
+            result["carCongestions"] = right["carCongestions"]
+            upbound.append(result)
+        
+
         
         # 1. 형님이 준 JSON 구조 그대로 조립
         payload = {
-            "station": station_info,     # 역 정보 객체
-            "upBound": up_bound_list,    # 상행선 리스트 (isBoardable 포함)
-            "downBound": down_bound_list # 하행선 리스트 (isBoardable 포함)
+            "context": context,
+            "station": station,     # 역 정보 객체
+            "upBound": upbound,    # 상행선 리스트 (isBoardable 포함)
+            "downBound": downbound # 하행선 리스트 (isBoardable 포함)
         }
         
         # 2. Redis Key: realtime:역ID (예: realtime:221)
         # 역 ID는 station_info 딕셔너리에서 꺼내서 씁니다.
         try:
-            station_id = station_info["stationId"]
-            key = f"realtime:{station_id}"
-            
             # 3. 저장 (TTL 120초 - 실시간이니까 짧게)
-            self.redis.setex(key, 120, json.dumps(payload, ensure_ascii=False))
-            print(f"🚀 [SDK] 실시간 전광판 데이터 저장 완료: {key}")
+            self.redis.setex(redis_key, 120, json.dumps(payload, ensure_ascii=False))
+            print(f"🚀 [SDK] 실시간 전광판 데이터 저장 완료: {redis_key}")
             
         except KeyError:
             print("💥 [SDK] 에러: station_info에 'stationId'가 없습니다.")
