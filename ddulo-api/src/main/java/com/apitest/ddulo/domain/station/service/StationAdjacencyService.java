@@ -1,9 +1,11 @@
 package com.apitest.ddulo.domain.station.service;
 
 import com.apitest.ddulo.domain.station.domain.Station;
-import com.apitest.ddulo.domain.station.dto.StationAdjacencyResult;
-import com.apitest.ddulo.domain.station.dto.StationNode;
+import com.apitest.ddulo.domain.station.dto.internal.StationAdjacencyResult;
+import com.apitest.ddulo.domain.station.dto.internal.StationNode;
 import com.apitest.ddulo.domain.station.repository.StationRepository;
+import com.apitest.ddulo.global.exception.CustomException;
+import com.apitest.ddulo.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import jakarta.annotation.PostConstruct;
@@ -194,8 +196,7 @@ public class StationAdjacencyService {
 
     private void initializeLine6() {
         // 응암 순환(단방향): 응암(610)->역촌(611)->...->구산(615)->응암(610)
-        // 문제에서 "응암->구산->응암"이라 하셨지만, 실제로는 611~615를 거쳐 돕니다.
-        // 역코드가 610~615 사이를 순환한다고 가정합니다.
+        // 역코드가 610~615 사이를 순환한다고 가정
         connectOneWay("610", "611");
         connectOneWay("611", "612");
         connectOneWay("612", "613");
@@ -236,8 +237,6 @@ public class StationAdjacencyService {
         // 공항철도: A01 ~ A11 (중간 코드 불규칙적이므로 직접 배열 선언)
         // 서울역(A01)~디지털미디어시티(A04)~마곡나루(A042)~김포공항(A05)~검암(A07)~
         // 청라국제도시(A071)~영종(A072)~운서(A08)~인천공항2터미널(A11)
-        // ※ 주의: A01~A04 사이 공덕(A02), 홍대(A03) 등 포함 여부는 DB 기준에 따름
-        // 제공해주신 주요 거점 기준으로 연결 예시:
         String[] stations = {
                 "A01", "A02", "A03", "A04", "A042", "A05",
                 "A06", "A07", "A071", "A072", "A08", "A09", "A10", "A11"
@@ -257,5 +256,12 @@ public class StationAdjacencyService {
         List<String> line = new ArrayList<>();
         for (int i = 209; i <= 272; i++) line.add("K" + i);
         connectBidirectional(line.toArray(new String[0]));
+    }
+
+    //역코드 유효성 검사
+    public void validateStationExists(String stationCode) {
+        if (!stationRepository.existsByStationCode(stationCode)) {
+            throw new CustomException(ErrorCode.STATION_NOT_FOUND);
+        }
     }
 }

@@ -1,4 +1,4 @@
-package com.apitest.ddulo.domain.station.dto;
+package com.apitest.ddulo.domain.station.dto.internal;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

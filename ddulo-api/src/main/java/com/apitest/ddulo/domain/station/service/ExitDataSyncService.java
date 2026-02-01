@@ -6,7 +6,7 @@ import com.apitest.ddulo.domain.metadata.service.ApiMetadataService;
 import com.apitest.ddulo.domain.station.client.SeoulApiClient;
 import com.apitest.ddulo.domain.station.domain.Exit;
 import com.apitest.ddulo.domain.station.domain.Station;
-import com.apitest.ddulo.domain.station.dto.SeoulExitResponseDto;
+import com.apitest.ddulo.domain.station.dto.external.openapi.FastExitData;
 import com.apitest.ddulo.domain.station.repository.ExitRepository;
 import com.apitest.ddulo.domain.station.repository.StationRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ExitSyncService {
+public class ExitDataSyncService {
 
     private static final String API_NAME = "SEOUL_EXIT_INFO";
 
@@ -64,7 +64,7 @@ public class ExitSyncService {
 
         while (hasNext) {
             log.info("Fetching exit info from {} to {}", startIndex, endIndex);
-            SeoulExitResponseDto response = null;
+            FastExitData response = null;
             try {
                 response = seoulApiClient.fetchExitInfo(startIndex, endIndex);
             } catch (Exception e) {
@@ -77,14 +77,14 @@ public class ExitSyncService {
                 break;
             }
 
-            SeoulExitResponseDto.Body body = response.getResponse().getBody();
+            FastExitData.Body body = response.getResponse().getBody();
             if (body.getItems() == null || body.getItems().getItem() == null) {
                 log.warn("No items found in response body.");
                 break;
             }
 
-            List<SeoulExitResponseDto.Item> items = body.getItems().getItem();
-            for (SeoulExitResponseDto.Item item : items) {
+            List<FastExitData.Item> items = body.getItems().getItem();
+            for (FastExitData.Item item : items) {
                 saveExitInfo(item);
             }
 
@@ -100,7 +100,7 @@ public class ExitSyncService {
     }
 
     //데이터 파싱 후 저장
-    private void saveExitInfo(SeoulExitResponseDto.Item item) {
+    private void saveExitInfo(FastExitData.Item item) {
         String stationCode = item.getStationCode();
 
         // Station 조회

@@ -1,4 +1,4 @@
-package com.apitest.ddulo.domain.station.dto;
+package com.apitest.ddulo.domain.station.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Builder
 @Schema(description = "최단시간 경로 DTO")
-public class RouteResponse {
+public class FastestPathResponse {
     @Schema(description = "총 소요시간(초)", example = "2240")
     private int totalTime;          // 총 소요 시간 (초)
     @Schema(description = "총 환승횟수", example = "1")

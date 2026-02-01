@@ -9,33 +9,42 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.format.TextStyle;
-import java.util.Locale;
 
 import static com.apitest.ddulo.global.utils.DateUtils.convertDateToDayKey;
+import static com.apitest.ddulo.global.utils.DateUtils.getCurrentTimeKey;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class PathService {
+public class PathRedisService {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
 
     // 전체 경로 및 상세 정보 조회 (path:full)
-    public PathFullResponse getFullPath(int startId, int endId, String targetDate, String targetTime) {
-        String dayOfWeek = convertDateToDayKey(targetDate);
+    public PathFullResponse getFullPath(String startId, String endId) {
         // Redis Key 생성: path:full:{start}:{end}:{요일}:{시간}
-        String redisKey = String.format("path:full:%d:%d:%s:%s", startId, endId, dayOfWeek, targetTime);
+        String redisKey = String.format(
+                "path:full:%s:%s:%s:%s",
+                startId,
+                endId,
+                convertDateToDayKey(String.valueOf(LocalDate.now())),
+                getCurrentTimeKey() //버림 메서드
+        );
 
         return fetchData(redisKey, PathFullResponse.class);
     }
 
     // 경로 예측 요약 정보 조회 (path:pred)
-    public PathPredictionResponse getPathPrediction(int startId, int endId, String targetDate, String targetTime) {
-        String dayOfWeek = convertDateToDayKey(targetDate);
+    public PathPredictionResponse getPathPrediction(String startId, String endId) {
         // Redis Key 생성: path:pred:{start}:{end}:{요일}:{시간}
-        String redisKey = String.format("path:pred:%d:%d:%s:%s", startId, endId, dayOfWeek, targetTime);
+        String redisKey = String.format(
+                "path:pred:%s:%s:%s:%s",
+                startId,
+                endId,
+                convertDateToDayKey(String.valueOf(LocalDate.now())),
+                getCurrentTimeKey() //버림 메서드
+        );
 
         return fetchData(redisKey, PathPredictionResponse.class);
     }

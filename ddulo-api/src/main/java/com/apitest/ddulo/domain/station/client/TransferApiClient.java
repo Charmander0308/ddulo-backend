@@ -1,6 +1,6 @@
 package com.apitest.ddulo.domain.station.client;
 
-import com.apitest.ddulo.domain.station.dto.FastTransferResponseDto;
+import com.apitest.ddulo.domain.station.dto.external.openapi.FastTransferData;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +23,7 @@ public class TransferApiClient {
     @Value("${data.api.encoding.key}")
     private String serviceKey;
 
-    public FastTransferResponseDto fetchTransferData(int page, int perPage) {
+    public FastTransferData fetchTransferData(int page, int perPage) {
         // 서비스 키가 이미 인코딩되어 있다면 build(true)를 사용하여 이중 인코딩 방지
         URI uri = UriComponentsBuilder.fromHttpUrl(apiUrl)
                 .queryParam("page", page)
@@ -35,7 +35,7 @@ public class TransferApiClient {
         log.info("Fetching transfer data from API: page={}, perPage={}", page, perPage);
         
         try {
-            return restTemplate.getForObject(uri, FastTransferResponseDto.class);
+            return restTemplate.getForObject(uri, FastTransferData.class);
         } catch (Exception e) {
             log.error("Failed to fetch transfer data: {}", e.getMessage());
             return null;

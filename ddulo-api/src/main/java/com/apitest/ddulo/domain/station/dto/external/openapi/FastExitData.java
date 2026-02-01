@@ -1,4 +1,4 @@
-package com.apitest.ddulo.domain.station.dto;
+package com.apitest.ddulo.domain.station.dto.external.openapi;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SeoulExitResponseDto {
+public class FastExitData {
 
     private Response response;
 

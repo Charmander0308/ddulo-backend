@@ -1,8 +1,8 @@
 package com.apitest.ddulo.domain.station.service;
 
 import com.apitest.ddulo.domain.station.client.RouteApiClient;
-import com.apitest.ddulo.domain.station.dto.SeoulApiDto;
-import com.apitest.ddulo.domain.station.dto.RouteResponse;
+import com.apitest.ddulo.domain.station.dto.external.openapi.FastPathData;
+import com.apitest.ddulo.domain.station.dto.response.FastestPathResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,21 +11,24 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.apitest.ddulo.global.utils.StationUtils.addStationSuffix;
+import static com.apitest.ddulo.global.utils.StationUtils.removeStationSuffix;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class RouteService {
+public class FastPathDataService {
 
     private final RouteApiClient routeApiClient;
 
-    public RouteResponse getSubwayRoute(String startStation, String endStation) {
+    public FastestPathResponse getSubwayRoute(String startStation, String endStation) {
         // 외부 API 데이터 조회
-        SeoulApiDto rawData = routeApiClient.searchRoute(removeStationSuffix(startStation), removeStationSuffix(endStation));
+        FastPathData rawData = routeApiClient.searchRoute(removeStationSuffix(startStation), removeStationSuffix(endStation));
 
         // 데이터 검증 (Null Check)
         if (rawData == null || rawData.getBody() == null || rawData.getBody().getPaths() == null) {
             log.warn("경로 데이터 없음: {} -> {}", startStation, endStation);
-            return RouteResponse.builder()
+            return FastestPathResponse.builder()
                     .totalTime(0)
                     .transferCount(0)
                     .legs(Collections.emptyList())
@@ -37,15 +40,15 @@ public class RouteService {
     }
 
     // 데이터 가공 로직 분리 (가독성 향상)
-    private RouteResponse transformToRouteResponse(SeoulApiDto rawData) {
-        List<SeoulApiDto.Path> paths = rawData.getBody().getPaths();
-        List<RouteResponse.RouteLeg> legs = new ArrayList<>();
+    private FastestPathResponse transformToRouteResponse(FastPathData rawData) {
+        List<FastPathData.Path> paths = rawData.getBody().getPaths();
+        List<FastestPathResponse.RouteLeg> legs = new ArrayList<>();
 
         String currentLine = null;
         String startStation = null;
         int sectionTimeAccumulator = 0;
 
-        for (SeoulApiDto.Path segment : paths) {
+        for (FastPathData.Path segment : paths) {
             String depName = segment.getDepartureStation().getStationName();
             String arrName = segment.getArrivalStation().getStationName();
             String lineName = segment.getDepartureStation().getLineName();
@@ -78,7 +81,7 @@ public class RouteService {
             addLeg(legs, startStation, lastStation, currentLine, sectionTimeAccumulator);
         }
 
-        return RouteResponse.builder()
+        return FastestPathResponse.builder()
                 .totalTime(rawData.getBody().getTotalTime())
                 .transferCount(rawData.getBody().getTransferCount())
                 .legs(legs)
@@ -86,22 +89,12 @@ public class RouteService {
     }
 
     // 리스트 추가 헬퍼 메서드
-    private void addLeg(List<RouteResponse.RouteLeg> legs, String start, String end, String line, int time) {
-        legs.add(RouteResponse.RouteLeg.builder()
+    private void addLeg(List<FastestPathResponse.RouteLeg> legs, String start, String end, String line, int time) {
+        legs.add(FastestPathResponse.RouteLeg.builder()
                 .startStation(addStationSuffix(start))
                 .endStation(addStationSuffix(end))
                 .lineName(line)
                 .sectionTime(time)
                 .build());
-    }
-
-    // '역' 접미사 제거
-    private String removeStationSuffix(String stationName) {
-        return stationName.endsWith("역") ? stationName.substring(0, stationName.length() - 1) : stationName;
-    }
-
-    // '역' 접미사 추가
-    private String addStationSuffix(String stationName) {
-        return stationName.endsWith("역") ? stationName : stationName + "역";
     }
 }

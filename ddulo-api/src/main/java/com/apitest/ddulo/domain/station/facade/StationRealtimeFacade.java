@@ -1,10 +1,10 @@
-package com.apitest.ddulo.domain.station.service;
+package com.apitest.ddulo.domain.station.facade;
 
-import com.apitest.ddulo.domain.station.dto.StationAdjacencyResult;
-import com.apitest.ddulo.domain.station.dto.StationArrivalResponse;
-import com.apitest.ddulo.domain.station.dto.StationDetailResponse;
-import com.apitest.ddulo.domain.station.dto.StationNode;
-import com.apitest.ddulo.domain.station.repository.StationRepository;
+import com.apitest.ddulo.domain.station.dto.internal.StationAdjacencyResult;
+import com.apitest.ddulo.domain.station.dto.response.StationArrivalResponse;
+import com.apitest.ddulo.domain.station.dto.external.redis.StationDetailData;
+import com.apitest.ddulo.domain.station.service.StationAdjacencyService;
+import com.apitest.ddulo.domain.station.service.StationRedisService;
 import com.apitest.ddulo.global.exception.CustomException;
 import com.apitest.ddulo.global.exception.ErrorCode;
 import com.apitest.ddulo.global.utils.SubwayUtils;
@@ -13,41 +13,37 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class StationRealtimeService {
+public class StationRealtimeFacade {
 
-    private final StationService stationService;
+    private final StationRedisService stationRedisService;
     private final StationAdjacencyService stationAdjacencyService;
-    private final StationRepository stationRepository;
 
     @Transactional(readOnly = true)
     public StationArrivalResponse getRealtimeStationDetail(String stationCode) {
         //없는 역코드면 예외처리
-        if(!stationRepository.existsByStationCode(stationCode))
-            throw new CustomException(ErrorCode.STATION_NOT_FOUND);
+        stationAdjacencyService.validateStationExists(stationCode);
         //redis에서 실시간 역/열차 정보 조회
-        StationDetailResponse stationDetailResponse = stationService.getStationDetail(stationCode);
+        StationDetailData stationDetailData = stationRedisService.getStationDetail(stationCode);
         //데이터가 없는 경우 예외처리
-        if(stationDetailResponse == null) throw new CustomException(ErrorCode.DATA_NOT_FOUND);
+        if(stationDetailData == null) throw new CustomException(ErrorCode.DATA_NOT_FOUND);
         //인접 역 리스트 조회
         StationAdjacencyResult nearStations = stationAdjacencyService.getAdjacentStations(stationCode);
         //인접 역이 모두 없는 경우 예외처리
         if(nearStations.getPrevStations().isEmpty() && nearStations.getNextStations().isEmpty())
             throw new CustomException(ErrorCode.DATA_NOT_FOUND);
 
-        return buildStationArrivalResponse(stationDetailResponse, nearStations);
+        return buildStationArrivalResponse(stationDetailData, nearStations);
     }
 
     //데이터를 정제해서 프론트엔드로 넘기는 dto를 생성
     private StationArrivalResponse buildStationArrivalResponse(
-            StationDetailResponse stationDetailResponse,
+            StationDetailData stationDetailData,
             StationAdjacencyResult nearStations) {
 
-        var station = stationDetailResponse.getStation();
+        var station = stationDetailData.getStation();
         String lineName = station.getLineName();
 
         return StationArrivalResponse.builder()
@@ -58,10 +54,10 @@ public class StationRealtimeService {
                         .prevStations(nearStations.getPrevStations())
                         .nextStations(nearStations.getNextStations())
                         .build())
-                .upBound(stationDetailResponse.getUpBound().stream()
+                .upBound(stationDetailData.getUpBound().stream()
                         .map(arrival -> mapToArrivalInfo(arrival, lineName))
                         .toList())
-                .downBound(stationDetailResponse.getDownBound().stream()
+                .downBound(stationDetailData.getDownBound().stream()
                         .map(arrival -> mapToArrivalInfo(arrival, lineName))
                         .toList())
                 .build();
@@ -69,7 +65,7 @@ public class StationRealtimeService {
 
     //열차 실시간 데이터 리스트 담는 메서드
     private StationArrivalResponse.ArrivalInfo mapToArrivalInfo(
-            StationDetailResponse.TrainArrival arrival,
+            StationDetailData.TrainArrival arrival,
             String lineName) {
 
         return StationArrivalResponse.ArrivalInfo.builder()
@@ -87,4 +83,5 @@ public class StationRealtimeService {
                         .toList())
                 .build();
     }
+
 }

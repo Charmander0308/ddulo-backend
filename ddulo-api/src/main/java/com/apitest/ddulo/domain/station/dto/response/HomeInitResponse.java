@@ -1,4 +1,4 @@
-package com.apitest.ddulo.domain.station.dto;
+package com.apitest.ddulo.domain.station.dto.response;
 
 import com.apitest.ddulo.domain.station.domain.Station;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Builder
 @Schema(description = "사용자 위치반경 내 역 데이터 DTO")
-public class HomeInitResponseDto {
+public class HomeInitResponse {
     @Schema(description = "역 목록")
     private List<StationDto> nearbyStations;  // 내 주변 1km 이내 역 (추천용, 상단 노출)
     @Schema(description = "전체 역 목록")

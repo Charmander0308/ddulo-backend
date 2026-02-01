@@ -15,7 +15,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PathPredictionResponse {
 
-    private PathContext context;
+    private PathContext context;    //응답이 잘 됐는지 확인하는 용도
     private long totalTimeSec;      //총 소요시간(초)
     private List<PathResult> results;   //경로 결과 리스트
 
@@ -43,7 +43,7 @@ public class PathPredictionResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class RouteStation {
-        private int stationId;      //역 ID
+        private String stationId;      //역 ID(역코드)
         private String lineName;    //노선명
     }
 

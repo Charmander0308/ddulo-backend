@@ -1,4 +1,4 @@
-package com.apitest.ddulo.domain.station.dto;
+package com.apitest.ddulo.domain.station.dto.external.openapi;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @ToString
-public class SeoulApiDto {
+public class FastPathData {
 
     @JsonProperty("body")
     private Body body;

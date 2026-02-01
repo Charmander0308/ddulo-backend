@@ -3,10 +3,7 @@ package com.apitest.ddulo.domain.station.service;
 import com.apitest.ddulo.domain.metadata.domain.ApiMetadata;
 import com.apitest.ddulo.domain.metadata.repository.ApiMetadataRepository;
 import com.apitest.ddulo.domain.metadata.service.ApiMetadataService;
-import com.apitest.ddulo.domain.station.client.StationApiClient;
 import com.apitest.ddulo.domain.station.domain.Station;
-import com.apitest.ddulo.domain.station.dto.PuzzleStationResponseDto;
-import com.apitest.ddulo.domain.station.dto.StationItemDto;
 import com.apitest.ddulo.domain.station.repository.StationRepository;
 import com.opencsv.CSVReader;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +20,10 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class StationSyncService {
+public class StationDataSyncService {
 
     private static final String API_NAME = "PUZZLE_STATION_META";
 
-    private final StationApiClient stationApiClient;
     private final StationRepository stationRepository;
     private final ApiMetadataRepository apiMetadataRepository;
     private final ApiMetadataService apiMetadataService;

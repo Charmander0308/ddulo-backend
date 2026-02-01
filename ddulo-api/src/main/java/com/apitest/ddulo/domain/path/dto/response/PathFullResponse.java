@@ -48,7 +48,7 @@ public class PathFullResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class StationInfo {
-        private int stationId;      //역 ID
+        private String stationId;      //역 ID(역코드)
         private String stationName; //역 이름
         private String lineName;    //노선명
         private int direction;      //운행방향(0:상행/외선, 1:하행/내선)

@@ -1,6 +1,6 @@
 package com.apitest.ddulo.domain.station.client;
 
-import com.apitest.ddulo.domain.station.dto.SeoulExitResponseDto;
+import com.apitest.ddulo.domain.station.dto.external.openapi.FastExitData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -15,8 +15,8 @@ public class SeoulApiClient {
 
     private final RestTemplate restTemplate;
 
-    public SeoulExitResponseDto fetchExitInfo(int startIndex, int endIndex) {
+    public FastExitData fetchExitInfo(int startIndex, int endIndex) {
         String url = String.format("%s/%d/%d", alightUrl, startIndex, endIndex);
-        return restTemplate.getForObject(url, SeoulExitResponseDto.class);
+        return restTemplate.getForObject(url, FastExitData.class);
     }
 }
