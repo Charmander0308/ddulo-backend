@@ -16,6 +16,9 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -23,11 +26,12 @@ import java.util.List;
 public class StationDataSyncService {
 
     private static final String API_NAME = "PUZZLE_STATION_META";
+    private static final String SEOUL_CODE_META_NAME = "SEOUL_STATION_CODE_UPDATE";
 
     private final StationRepository stationRepository;
-    private final ApiMetadataRepository apiMetadataRepository;
     private final ApiMetadataService apiMetadataService;
 
+    //station 데이터 적재 로직
     @Transactional
     public void syncStationsIfNeeded() {
 
@@ -38,23 +42,76 @@ public class StationDataSyncService {
         }
         log.info("Station 데이터를 찾을 수 없으므로, 동기화를 실행합니다.");
 
-        // 외부 API 호출
-//        syncStations();
-
         // CSV 데이터 로드
         loadStationCsvData();
 
-        //성공 후 메타데이터 갱신 (없으면 생성, 있으면 업데이트)
-        ApiMetadata metadata = apiMetadataRepository.findByApiName(API_NAME)
-                .orElseGet(() -> ApiMetadata.builder()
-                        .apiName(API_NAME)
-                        .updateIntervalDay(null) // null : 최초 1회만, N : N일마다 업데이트
-                        .build());
-
-        metadata.markUpdated(); // 현재 시간 찍기
-        apiMetadataRepository.save(metadata);
+        //성공 후 메타데이터 갱신 (없으면 생성)
+        apiMetadataService.updateMetadata(API_NAME);
     }
 
+    //station 데이터에 서울시 api의 역코드 추가 업데이트 로직
+    @Transactional
+    public void syncSeoulStationCodesIfNeeded() {
+        // 이미 실행했는지 메타데이터 확인
+        if (!apiMetadataService.isApiCallNeeded(SEOUL_CODE_META_NAME)) {
+            log.info("Seoul Station Code 업데이트가 이미 완료되어 생략합니다.");
+            return;
+        }
+        log.info("Seoul Station Code 업데이트를 시작합니다.");
+
+        // CSV 데이터 로드
+        updateSeoulStationCodesFromCsv();
+
+        //성공 후 메타데이터 갱신 (없으면 생성)
+        apiMetadataService.updateMetadata(SEOUL_CODE_META_NAME);
+    }
+
+    // CSV를 읽어 기존 Station에 seoulStationCode를 매핑하여 업데이트
+    private void updateSeoulStationCodesFromCsv() {
+        ClassPathResource resource = new ClassPathResource("data/seoul_station_code.csv");
+
+        try (CSVReader csvReader = new CSVReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
+
+            // 성능을 위해 기존의 모든 Station을 조회하여 Map으로 변환 (Key: stationCode, Value: Station)
+            // 이렇게 하면 CSV 한 줄마다 DB 조회를 할 필요가 없어짐 (N+1 문제 방지)
+            List<Station> allStations = stationRepository.findAll();
+            Map<String, Station> stationMap = allStations.stream()
+                    .collect(Collectors.toMap(Station::getStationCode, Function.identity(), (oldValue, newValue) -> oldValue));
+
+            // CSV 읽기
+            List<String[]> allRows = csvReader.readAll();
+            int updatedCount = 0;
+
+            // CSV 파싱 및 업데이트 (i = 1 부터 시작하여 헤더 스킵)
+            for (int i = 1; i < allRows.size(); i++) {
+                String[] row = allRows.get(i);
+
+                // CSV 구조:
+                // 0:"전철역코드", 1:"전철역명", 2:"전철명명(영문)", 3:"호선", 4:"외부코드", ...
+                if (row.length < 5) continue;
+
+                String seoulCode = row[0];   // 매핑할 값 (예: "1722")
+                String externalCode = row[4]; // 매핑 기준 키 (예: "P163")
+
+                // Map에서 찾아오기 (DB 조회 X)
+                Station station = stationMap.get(externalCode);
+
+                if (station != null) {
+                    // 엔티티 값 변경 -> @Transactional에 의해 메서드 종료 시 자동 update 쿼리 나감 (Dirty Checking)
+                    station.updateSeoulStationCode(seoulCode);
+                    updatedCount++;
+                }
+            }
+
+            log.info("총 {}건 중 {}건의 SeoulStationCode 업데이트 완료", allRows.size() - 1, updatedCount);
+
+        } catch (Exception e) {
+            log.error("Seoul Station Code CSV 업데이트 중 오류 발생", e);
+            throw new RuntimeException("서울 역코드 업데이트 실패");
+        }
+    }
+
+    // station CSV 로드 로직
     private void loadStationCsvData() {
         ClassPathResource resource = new ClassPathResource("data/station.csv");
 
@@ -96,14 +153,15 @@ public class StationDataSyncService {
 
             // DB 저장
             stationRepository.saveAll(stationList);
-            log.info("[DataInit] 총 {}건의 Station 데이터 저장 완료", stationList.size());
+            log.info("총 {}건의 Station 데이터 저장 완료", stationList.size());
 
         } catch (Exception e) {
-            log.error("[DataInit] CSV 초기화 중 오류 발생", e);
+            log.error("CSV 초기화 중 오류 발생", e);
             // throw new RuntimeException("데이터 초기화 실패");
         }
     }
 
+    //위경도 파싱 로직
     private double parseDoubleOrDefault(String value) {
         // null이거나, 빈 문자열이거나, 공백만 있는 경우
         if (value == null || value.trim().isEmpty()) {
@@ -118,41 +176,4 @@ public class StationDataSyncService {
             return 0.0;
         }
     }
-
-
-//    @Transactional
-//    public void syncStations() {
-//        int offset = 0;
-//        int limit = 100;
-//
-//        while (true) {
-//            log.info("Fetching station info offset: {}, limit: {}", offset, limit);
-//            PuzzleStationResponseDto response =
-//                    stationApiClient.fetchStations(offset, limit);
-//
-//            if (response == null || response.getContents() == null) {
-//                log.error("Failed to fetch station info");
-//                break;
-//            }
-//
-//            for (StationItemDto item : response.getContents()) {
-//
-//                if (!stationRepository.existsByStationCode(item.getStationCode())) {
-//                    Station station = Station.builder()
-//                            .stationCode(item.getStationCode())
-//                            .stationName(item.getStationName())
-//                            .lineName(item.getSubwayLine())
-//                            .build();
-//
-//                    stationRepository.save(station);
-//                }
-//            }
-//
-//            offset += limit;
-//            if (response.getStatus() == null || offset >= response.getStatus().getTotalCount()) {
-//                break;
-//            }
-//        }
-//        log.info("Station info sync completed.");
-//    }
 }

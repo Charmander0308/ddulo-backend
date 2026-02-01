@@ -1,5 +1,6 @@
 package com.apitest.ddulo.domain.station.initializer;
 
+import com.apitest.ddulo.domain.station.facade.StationSyncFacade;
 import com.apitest.ddulo.domain.station.service.StationDataSyncService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -11,10 +12,10 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class StationDataInitializer {
 
-    private final StationDataSyncService stationDataSyncService;
+    private final StationSyncFacade stationSyncFacade;
 
     @PostConstruct
     public void init() {
-        stationDataSyncService.syncStationsIfNeeded();
+        stationSyncFacade.initializeStationData();
     }
 }
