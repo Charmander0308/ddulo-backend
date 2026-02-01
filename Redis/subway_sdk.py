@@ -138,6 +138,9 @@ class SubwayHelper:
     # =================================================================
     def save_full_route_json(self, 
                              redis_key,           # 저장할 Key path:full:{출발Id}:{도착ID}:{요일}:{시간}
+
+                             estimated_boarding_time,
+                             boarding_probability, # 탑승확률
                              
                              # 2. 출발역 정보 (메타 + 알고리즘 결과)
                              start_station_datas,
@@ -163,6 +166,7 @@ class SubwayHelper:
                 "lineName": start_station_data.get("lineName", ""),
                 "direction": start_station_data["direction"], # 꼭 채워줘야함!!!!!
                 "estimatedWatingSec": start_station_data.get("estimatedWatingSec", 0),
+                "isBoardable": start_station_data["isBoardable"],
                 "result": [
                     {
                         "carCongestions": start_station_data["carCongestions"],
@@ -171,7 +175,7 @@ class SubwayHelper:
                         "bestBoardings": start_station_data["bestBoardings"],
                         "comfortBoarding": start_station_data["comfortBoarding"],
                     }
-                ] if "carCongestions" in start_station_data else []
+                ] if len(start_station_data["carCongestions"]) != 0 else []
             }
             start_station_payload.append(start_station_info)
 
@@ -188,6 +192,7 @@ class SubwayHelper:
                     "lineName": station.get("lineName", ""),
                     "direction": station["direction"],
                     "estimatedWaitingSec": station.get("estimatedWaitingSec", 0),
+                    "isBoardable" : station["isBoardable"],
                     "results": [ 
                         {
                             "carCongestions": station["carCongestions"],
@@ -196,7 +201,7 @@ class SubwayHelper:
                             "bestBoardings": station["bestBoardings"],
                             "comfortBoarding": station["comfortBoarding"],
                         }
-                    ] if "carCongestions" in station else []
+                    ] if len(stations) == 0 else []
                 })
             transfer_payload.append({"stations": stations})
         
@@ -213,6 +218,8 @@ class SubwayHelper:
 
         # 4. 최종 JSON 완성 (형이 준 구조 그대로)
         final_payload = {
+            "estimatedBoardingTime" :estimated_boarding_time,
+            "boardingProbability": boarding_probability,
             "startStation": start_station_payload,
             "transferStation": transfer_payload,
             "endStation": end_station_payload
