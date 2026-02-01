@@ -1,8 +1,7 @@
-package com.apitest.ddulo.domain.route.service;
+package com.apitest.ddulo.domain.path.service;
 
-import com.apitest.ddulo.domain.path.dto.response.PathFullResponse;
-import com.apitest.ddulo.domain.path.service.PathRedisService;
-import com.apitest.ddulo.domain.route.dto.ResultResponse;
+import com.apitest.ddulo.domain.path.dto.external.redis.PathFullData;
+import com.apitest.ddulo.domain.path.dto.response.ResultResponse;
 import com.apitest.ddulo.domain.station.dto.response.FastestPathResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,16 +27,16 @@ public class ResultService {
     private ResultResponse buildResultResponse(FastestPathResponse fastestPathResponse) {
         List<FastestPathResponse.RouteLeg> legs = fastestPathResponse.getLegs();
 
-        PathFullResponse pathFullResponse =  pathRedisService.getFullPath(
+        PathFullData pathFullData =  pathRedisService.getFullPath(
                 legs.get(0).getStartStation(),
                 legs.get(legs.size() - 1).getEndStation()
         );
-        if(pathFullResponse == null) return null;   //커스텀 예외처리
+        if(pathFullData == null) return null;   //커스텀 예외처리
 
         return ResultResponse.builder()
                 .totalTimeSecond(fastestPathResponse.getTotalTime())
-                .estimatedBoardingTime(LocalDateTime.parse(pathFullResponse.getEstimatedBoardingTime()))
-                .boardingProbability(pathFullResponse.getBoardingProbability())
+                .estimatedBoardingTime(LocalDateTime.parse(pathFullData.getEstimatedBoardingTime()))
+                .boardingProbability(pathFullData.getBoardingProbability())
 
 //                .startStation()
 

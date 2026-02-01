@@ -41,6 +41,9 @@ public class FastPathData {
 
         @JsonProperty("arvlStn")
         private StationInfo arrivalStation;   // 도착역 정보
+
+        @JsonProperty("upbdnbSe")
+        private String direction;   // 상행(내선)/하행(외선) 구분
     }
 
     @Getter

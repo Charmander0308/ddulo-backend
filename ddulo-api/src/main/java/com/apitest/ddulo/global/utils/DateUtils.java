@@ -20,6 +20,14 @@ public class DateUtils {
                 .toUpperCase();
     }
 
+    // Util: 요일을 키값으로(ex: WED -> 1) 변환하는 메서드
+    // 평일:1, 토요일:2, 휴일/일요일:3
+    public static String convertDayKeyToWeekTag(String dayKey) {
+        if(dayKey.equals("SUN")) return "3";
+        if(dayKey.equals("SAT")) return "2";
+        return "1";
+    }
+
     // Util: 시간을 10분 간격으로 내림 처리하는 메서드(ex: 14:37:21 -> "1430")
     public static String getCurrentTimeKey() {
         LocalTime now = LocalTime.now();

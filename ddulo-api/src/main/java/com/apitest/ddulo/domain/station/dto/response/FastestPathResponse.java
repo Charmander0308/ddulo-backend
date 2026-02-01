@@ -27,6 +27,8 @@ public class FastestPathResponse {
         private String endStation;   // 구간 도착역
         @Schema(description = "이용 노선", example = "2호선")
         private String lineName;     // 이용 노선
+        @Schema(description = "방향", example = "내선")
+        private String direction;    // 상행(내선)/하행(외선) 구분
         @Schema(description = "구간 소요시간", example = "1080")
         private int sectionTime;     // 구간 소요 시간
     }

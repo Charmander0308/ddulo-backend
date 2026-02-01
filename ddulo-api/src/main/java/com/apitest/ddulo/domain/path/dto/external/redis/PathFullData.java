@@ -1,4 +1,4 @@
-package com.apitest.ddulo.domain.path.dto.response;
+package com.apitest.ddulo.domain.path.dto.external.redis;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PathFullResponse {
+public class PathFullData {
 
     private PathContext context;    //응답이 잘 됐는지 확인하는 용도
     private long totalTimeSecond;   //총 소요시간

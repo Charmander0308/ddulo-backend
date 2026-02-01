@@ -1,6 +1,6 @@
 package com.apitest.ddulo.domain.station.dto.response;
 
-import com.apitest.ddulo.domain.route.dto.ResultResponse;
+import com.apitest.ddulo.domain.path.dto.response.ResultResponse;
 import lombok.Builder;
 import lombok.Getter;
 

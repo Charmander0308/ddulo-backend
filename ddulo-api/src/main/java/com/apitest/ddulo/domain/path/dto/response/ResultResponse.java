@@ -1,4 +1,4 @@
-package com.apitest.ddulo.domain.route.dto;
+package com.apitest.ddulo.domain.path.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;

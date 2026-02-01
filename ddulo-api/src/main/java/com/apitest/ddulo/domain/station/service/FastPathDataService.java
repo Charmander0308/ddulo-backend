@@ -46,20 +46,23 @@ public class FastPathDataService {
 
         String currentLine = null;
         String startStation = null;
+        String currentDirection = null; // 방향 정보 추가
         int sectionTimeAccumulator = 0;
 
         for (FastPathData.Path segment : paths) {
             String depName = segment.getDepartureStation().getStationName();
             String arrName = segment.getArrivalStation().getStationName();
             String lineName = segment.getDepartureStation().getLineName();
+            String direction = segment.getDirection(); // 방향 정보 가져오기
 
             // Case A: 환승 보행 구간 (출발역 == 도착역)
             if (depName.equals(arrName)) {
                 if (currentLine != null) {
-                    addLeg(legs, startStation, depName, currentLine, sectionTimeAccumulator);
+                    addLeg(legs, startStation, depName, currentLine, currentDirection, sectionTimeAccumulator);
                 }
                 // 리셋
                 currentLine = null;
+                currentDirection = null;
                 sectionTimeAccumulator = segment.getRequiredTime(); // 환승 시간 포함
                 startStation = arrName;
                 continue;
@@ -68,6 +71,7 @@ public class FastPathDataService {
             // Case B: 지하철 탑승 구간 시작
             if (currentLine == null) {
                 currentLine = lineName;
+                currentDirection = direction;
                 if (startStation == null) startStation = depName;
             }
 
@@ -78,7 +82,7 @@ public class FastPathDataService {
         // Case C: 마지막 구간 처리
         if (currentLine != null && !paths.isEmpty()) {
             String lastStation = paths.get(paths.size() - 1).getArrivalStation().getStationName();
-            addLeg(legs, startStation, lastStation, currentLine, sectionTimeAccumulator);
+            addLeg(legs, startStation, lastStation, currentLine, currentDirection, sectionTimeAccumulator);
         }
 
         return FastestPathResponse.builder()
@@ -89,11 +93,12 @@ public class FastPathDataService {
     }
 
     // 리스트 추가 헬퍼 메서드
-    private void addLeg(List<FastestPathResponse.RouteLeg> legs, String start, String end, String line, int time) {
+    private void addLeg(List<FastestPathResponse.RouteLeg> legs, String start, String end, String line, String direction, int time) {
         legs.add(FastestPathResponse.RouteLeg.builder()
                 .startStation(addStationSuffix(start))
                 .endStation(addStationSuffix(end))
                 .lineName(line)
+                .direction(direction)
                 .sectionTime(time)
                 .build());
     }

@@ -21,4 +21,13 @@ public class SubwayUtils {
         // 응암 순환 구간도 여기서 '상행/하행'으로 처리됨
         return direction == 0 ? "상행" : "하행";
     }
+
+    // 방향을 숫자 문자열로 변환
+    public static String getDirectionNumber(String direction) {
+        if(direction.equals("내선") || direction.equals("상행"))
+            return "1";
+        if(direction.equals("외선") || direction.equals("하행"))
+            return "2";
+        return null;
+    }
 }
