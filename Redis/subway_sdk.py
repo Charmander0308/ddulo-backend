@@ -231,6 +231,74 @@ class SubwayHelper:
             print(f"🚀 [SDK] 전체 JSON 저장 완료: {redis_key}")
         except Exception as e:
             print(f"💥 [SDK] 저장 실패: {e}")
+    
+    def save_route_list_json(self, 
+                             redis_key,           # 저장할 Key path:full:{출발Id}:{도착ID}:{요일}:{시간}
+
+                             routes,
+                             departure_times,
+                             boarding_probability
+                             ):
+        """
+        저장 형식
+        {    
+            "context": {
+                "redisKey": "path:pred:221:748:WED:1800"
+            },
+                    
+            "results": [
+                {
+                "route": [
+                    {
+                    "stationId": "221"
+                    },
+                    {
+                    "stationId": "233"
+                    },
+                    {
+                    "stationId": "748"
+                    }
+                ],
+                "schedule": [
+                    {
+                    "departureTime": "18:03:00"
+                    "boardingProbability": 0
+                    },
+                    {
+                    "departureTime": "18:33:00"
+                    "boardingProbability": 92
+                    }
+                ]
+                }
+            ]
+        }
+        """
+        
+
+        # 4. 최종 JSON 완성 (형이 준 구조 그대로)
+        final_payload = {
+            "context":{"redisKey":redis_key},
+            "results": [
+                {
+                    "route":[
+                        {"stationId" : id} for id in routes
+                    ],
+                    "schedule":[
+                        {"departureTime":time,
+                         "boardingProbability":probability 
+                        }
+                        for time, probability in zip(departure_times, boarding_probability)
+                    ]
+                }
+            ],
+        }
+
+        # 5. Redis 저장
+        try:
+            self.redis.setex(redis_key, 60, json.dumps(final_payload, ensure_ascii=False))
+            print(f"🚀 [SDK] 전체 JSON 저장 완료: {redis_key}")
+        except Exception as e:
+            print(f"💥 [SDK] 저장 실패: {e}")
 
     # =================================================================
     # 🔥 [DataSet 2] 실시간 전광판용 (인접 열차 3개 + 탑승가능여부)
