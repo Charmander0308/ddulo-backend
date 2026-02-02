@@ -1,6 +1,5 @@
 import json
 import threading
-from turtle import right
 import paho.mqtt.client as mqtt
 import os
 from dotenv import load_dotenv
