@@ -80,7 +80,7 @@ class CongestionCalculation():
                 self.platform_counts.append(count)
                 
                 # 공식: (인원 / 면적) / 4.3 * 100
-                density = count / areagit
+                density = count / area
                 congestion = (density / STD_DENSITY) * 100
                 
                 car_congestion.append(round(congestion, 2))
