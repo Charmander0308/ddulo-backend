@@ -512,14 +512,14 @@ def station_status_calculate_and_save(day_of_week, station_id, left_times, right
     helper.save_for_station_board(
         redis_key=f'stat:near:{station_id}:{day_of_week}:{left_times[0].replace(":", "")}',
         station_id=station_id,
-        up_bound=right_datas,
-        down_bound=left_datas
+        up_bound=right_datas, # direction 1
+        down_bound=left_datas # direction 0
     )
 
 
 if __name__ == "__main__":
-    process_statistical_data()
-    process_platform_area_data()
+    # process_statistical_data()
+    # process_platform_area_data()
     print("Statistical data and platform area data processing completed.")
 
     # optimized_path_calculate_and_save(
