@@ -9,6 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+
+import static com.apitest.ddulo.global.utils.DateUtils.convertDateToDayKey;
+import static com.apitest.ddulo.global.utils.DateUtils.getCurrentTimeKey;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -23,10 +28,10 @@ public class StationRedisService {
         String redisKey = String.format(
                 "stat:near:%s:%s:%s",
                 stationCode,
-//                convertDateToDayKey(String.valueOf(LocalDate.now())),
-//                getCurrentTimeKey()
-                "WED",
-                "1430"
+                convertDateToDayKey(String.valueOf(LocalDate.now())),
+                getCurrentTimeKey()
+//                "WED",
+//                "1430"
         );
 
         Object rawData = redisTemplate.opsForValue().get(redisKey);

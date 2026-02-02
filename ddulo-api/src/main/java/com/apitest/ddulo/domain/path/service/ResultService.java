@@ -1,8 +1,12 @@
 package com.apitest.ddulo.domain.path.service;
 
 import com.apitest.ddulo.domain.path.dto.external.redis.PathFullData;
+import com.apitest.ddulo.domain.path.dto.response.PathPredictionResponse;
 import com.apitest.ddulo.domain.path.dto.response.ResultResponse;
 import com.apitest.ddulo.domain.station.dto.response.FastestPathResponse;
+import com.apitest.ddulo.domain.station.repository.StationRepository;
+import com.apitest.ddulo.global.exception.CustomException;
+import com.apitest.ddulo.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -10,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Slf4j
 @Service
@@ -17,192 +22,131 @@ import java.util.List;
 public class ResultService {
 
     private final PathRedisService pathRedisService;
+    private final StationRepository stationRepository;
 
-    @Transactional
-    public ResultResponse getResult(FastestPathResponse fastestPathResponse){
-        return buildResultResponse(fastestPathResponse);
+    @Transactional(readOnly = true)
+    public ResultResponse getResult(
+            FastestPathResponse fastestPathResponse,
+            PathPredictionResponse pathPredictionResponse){
+        return buildResultResponse(fastestPathResponse, pathPredictionResponse);
     }
     
     // 최적경로정보로 최종결과반환DTO를 만드는 메서드
-    private ResultResponse buildResultResponse(FastestPathResponse fastestPathResponse) {
+    private ResultResponse buildResultResponse(
+            FastestPathResponse fastestPathResponse,
+            PathPredictionResponse pathPredictionResponse) {
+        // (탑승)구간별 상세정보 목록
         List<FastestPathResponse.RouteLeg> legs = fastestPathResponse.getLegs();
 
-        PathFullData pathFullData =  pathRedisService.getFullPath(
+        // 시작역과 종료역 코드 조회
+        String startStationCode = getStationCode(
                 legs.get(0).getStartStation(),
-                legs.get(legs.size() - 1).getEndStation()
+                legs.get(0).getLineName()
         );
-        if(pathFullData == null) return null;   //커스텀 예외처리
+        String endStationCode = getStationCode(
+                legs.get(legs.size() - 1).getEndStation(),
+                legs.get(legs.size() - 1).getLineName()
+        );
+
+        // Redis 데이터 조회
+        PathFullData pathFullData = pathRedisService.getFullPath(startStationCode, endStationCode);
+        if (pathFullData == null) {
+            throw new CustomException(ErrorCode.DATA_NOT_FOUND);
+        }
 
         return ResultResponse.builder()
                 .totalTimeSecond(fastestPathResponse.getTotalTime())
                 .estimatedBoardingTime(LocalDateTime.parse(pathFullData.getEstimatedBoardingTime()))
                 .boardingProbability(pathFullData.getBoardingProbability())
-
-//                .startStation()
-
-
-
-
+                .startStation(mapStationInfoList(pathFullData.getStartStation()))
+                .transferStation(mapTransferStations(pathFullData.getTransferStation()))
+                .endStation(mapStationInfo(pathFullData.getEndStation()))
                 .build();
     }
 
-//    private ResultResponse sample(ResultRequest request){
-//        return ResultResponse.builder()
-//                .totalTimeSecond(request.getData().getTotalTime())
-//                .estimatedBoardingTime(LocalDateTime.now())
-//                .boardingProbability(96.5)
-//
-//                .startStation(createStartStation())
-//                .transferStation(createAllTransferStations())
-//                .endStation(createEndStation())
-//                .build();
-//    }
-//
-//    private ResultResponse.StationInfo createStartStation() {
-//        return ResultResponse.StationInfo.builder()
-//                .stationId(221L)
-//                .stationName("역삼역")
-//                .lineName("2호선")
-//                .nextStationName("강남역")
-//                .estimatedWatingSec(150)
-//                .results(List.of(
-//                        ResultResponse.ResultInfo.builder()
-//                                .carCongestions(createAllCarCongestions())
-//                                .stationCongestions(createAllDoorCongestions())
-//                                .bestBoardings(createAllBestBoardings())
-//                                .comfortBoarding(createAllComfortBoardings())
-//                                .arrivalInfos(List.of(
-//                                        ResultResponse.ArrivalInfo.builder()
-//                                                .direction("내선")
-//                                                .arrivalSec(175)
-//                                                .currentStation("선릉역")
-//                                                .destination("성수(내선)역")
-//                                                .build(),
-//                                        ResultResponse.ArrivalInfo.builder()
-//                                                .direction("내선")
-//                                                .arrivalSec(355)
-//                                                .currentStation("삼성역")
-//                                                .destination("성수(내선)역")
-//                                                .build(),
-//                                        ResultResponse.ArrivalInfo.builder()
-//                                                .direction("내선")
-//                                                .arrivalSec(505)
-//                                                .currentStation("종합운동장역")
-//                                                .destination("성수(내선)역")
-//                                                .build()
-//                                ))
-//                                .build()
-//                ))
-//                .build();
-//    }
-//
-//    private ResultResponse.StationInfo createEndStation(){
-//        return ResultResponse.StationInfo.builder()
-//                .stationId(342L)
-//                .stationName("광명사거리역")
-//                .lineName("7호선")
-//                .nextStationName(null)
-//                .estimatedWatingSec(0)
-//                .results(null)
-//                .build();
-//    }
-//
-//    private List<ResultResponse.StationInfo> createAllTransferStations() {
-//        List<ResultResponse.StationInfo> list = new ArrayList<>();
-//        list.add(ResultResponse.StationInfo.builder()
-//                        .stationId(338L)
-//                        .stationName("대림역")
-//                        .lineName("7호선")
-//                        .nextStationName("남구로역")
-//                        .estimatedWatingSec(150)
-//                        .results(List.of(
-//                                ResultResponse.ResultInfo.builder()
-//                                        .carCongestions(createAllCarCongestions())
-//                                        .stationCongestions(createAllDoorCongestions())
-//                                        .bestBoardings(createAllBestBoardings())
-//                                        .comfortBoarding(createAllComfortBoardings())
-//                                        .arrivalInfos(List.of(
-//                                                ResultResponse.ArrivalInfo.builder()
-//                                                        .direction("하행")
-//                                                        .arrivalSec(175)
-//                                                        .currentStation("신풍역")
-//                                                        .destination("온수역")
-//                                                        .build(),
-//                                                ResultResponse.ArrivalInfo.builder()
-//                                                        .direction("하행")
-//                                                        .arrivalSec(355)
-//                                                        .currentStation("보라매역")
-//                                                        .destination("석남역")
-//                                                        .build(),
-//                                                ResultResponse.ArrivalInfo.builder()
-//                                                        .direction("하행")
-//                                                        .arrivalSec(505)
-//                                                        .currentStation("신대방삼거리역")
-//                                                        .destination("온수역")
-//                                                        .build()
-//                                        ))
-//                                        .build()
-//                        ))
-//                        .build()
-//        );
-//
-//        return list;
-//    }
-//
-//    private List<ResultResponse.CarCongestion> createAllCarCongestions() {
-//        List<ResultResponse.CarCongestion> list = new ArrayList<>();
-//
-//        for(int car = 1; car <= 10; car++){
-//            list.add(ResultResponse.CarCongestion.builder()
-//                    .carNo(car)
-//                    .congestionLevel(car * 10)
-//                    .build());
-//        }
-//
-//        return list;
-//    }
-//
-//    // 샘플 데이터 자동 생성
-//    private List<ResultResponse.StationCongestion> createAllDoorCongestions() {
-//        List<ResultResponse.StationCongestion> list = new ArrayList<>();
-//
-//        for (int car = 1; car <= 10; car++) {
-//            for (int door = 1; door <= 4; door++) {
-//                list.add(ResultResponse.StationCongestion.builder()
-//                        .carNo(car)
-//                        .doorNo(door)
-//                        .congestionLevel((car * 10) + door)
-//                        .build());
-//            }
-//        }
-//        return list;
-//    }
-//
-//    private List<ResultResponse.BoardingInfo> createAllBestBoardings() {
-//        List<ResultResponse.BoardingInfo> list = new ArrayList<>();
-//        list.add(ResultResponse.BoardingInfo.builder()
-//                .carNo(7)
-//                .doorNo(1)
-//                .build());
-//        list.add(ResultResponse.BoardingInfo.builder()
-//                .carNo(4)
-//                .doorNo(1)
-//                .build());
-//        return list;
-//    }
-//
-//    private List<ResultResponse.BoardingInfo> createAllComfortBoardings() {
-//        List<ResultResponse.BoardingInfo> list = new ArrayList<>();
-//        list.add(ResultResponse.BoardingInfo.builder()
-//                .carNo(5)
-//                .doorNo(3)
-//                .build());
-//        list.add(ResultResponse.BoardingInfo.builder()
-//                .carNo(5)
-//                .doorNo(4)
-//                .build());
-//        return list;
-//    }
+    // 역 코드 조회 헬퍼 메서드
+    private String getStationCode(String stationName, String lineName) {
+        return String.valueOf(
+                stationRepository.findStationCodeByNameAndLine(stationName, lineName)
+                        .orElseThrow(() -> new CustomException(ErrorCode.STATION_NOT_FOUND))
+        );
+    }
 
+    private List<ResultResponse.StationInfo> mapStationInfoList(List<PathFullData.StationInfo> sourceList) {
+        if (sourceList == null) return null;
+        return sourceList.stream()
+                .map(this::mapStationInfo)
+                .toList();
+    }
 
+    private ResultResponse.StationInfo mapStationInfo(PathFullData.StationInfo source) {
+        if (source == null) return null;
+        return ResultResponse.StationInfo.builder()
+                .stationCode(source.getStationId())
+                .stationName(source.getStationName())
+                .lineName(source.getLineName())
+                .estimatedWaitingSec(source.getEstimatedWaitingSec())
+                .isBoardable(source.isBoardable())
+                .results(mapResultInfoList(source.getResults()))
+                .build();
+    }
+
+    private List<ResultResponse.TransferStationGroup> mapTransferStations(List<PathFullData.TransferSection> sourceList) {
+        if (sourceList == null) return null;
+        return IntStream.range(0, sourceList.size())
+                .mapToObj(i -> ResultResponse.TransferStationGroup.builder()
+                        .transferOrder(i + 1)
+                        .options(mapStationInfoList(sourceList.get(i).getStations()))
+                        .build())
+                .toList();
+    }
+
+    private List<ResultResponse.ResultInfo> mapResultInfoList(List<PathFullData.DetailResult> sourceList) {
+        if (sourceList == null) return null;
+        return sourceList.stream()
+                .map(this::mapResultInfo)
+                .toList();
+    }
+
+    private ResultResponse.ResultInfo mapResultInfo(PathFullData.DetailResult source) {
+        if (source == null) return null;
+        return ResultResponse.ResultInfo.builder()
+                .carCongestions(mapCarCongestions(source.getCarCongestions()))
+                .stationCongestions(mapStationCongestions(source.getStationCongestions()))
+                .totalCongestions(mapStationCongestions(source.getTotalCongestions()))
+                .bestBoardings(mapBoardingInfos(source.getBestBoardings()))
+                .comfortBoarding(mapBoardingInfos(source.getComfortBoarding()))
+                .build();
+    }
+
+    private List<ResultResponse.CarCongestion> mapCarCongestions(List<PathFullData.CarCongestion> sourceList) {
+        if (sourceList == null) return null;
+        return sourceList.stream()
+                .map(s -> ResultResponse.CarCongestion.builder()
+                        .carNo(s.getCarNo())
+                        .congestionLevel(s.getCongestionLevel())
+                        .build())
+                .toList();
+    }
+
+    private List<ResultResponse.StationCongestion> mapStationCongestions(List<PathFullData.DoorCongestion> sourceList) {
+        if (sourceList == null) return null;
+        return sourceList.stream()
+                .map(s -> ResultResponse.StationCongestion.builder()
+                        .carNo(s.getCarNo())
+                        .doorNo(s.getDoorNo())
+                        .congestionLevel(s.getCongestionLevel())
+                        .build())
+                .toList();
+    }
+
+    private List<ResultResponse.BoardingInfo> mapBoardingInfos(List<PathFullData.BoardingSpot> sourceList) {
+        if (sourceList == null) return null;
+        return sourceList.stream()
+                .map(s -> ResultResponse.BoardingInfo.builder()
+                        .carNo(s.getCarNo())
+                        .doorNo(s.getDoorNo())
+                        .build())
+                .toList();
+    }
 }

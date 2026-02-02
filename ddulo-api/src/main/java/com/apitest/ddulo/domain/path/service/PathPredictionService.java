@@ -52,7 +52,7 @@ public class PathPredictionService {
 
         String endCode = stationRepository.findStationCodeByNameAndLine(
                         StationUtils.addStationSuffix(endStationName), endLineName)
-                .orElseThrow(() -> new CustomException(ErrorCode.DATA_NOT_FOUND));   //커스텀 에러로 변경하기
+                .orElseThrow(() -> new CustomException(ErrorCode.DATA_NOT_FOUND));
         
         //Redis에서 경로 예측 요약 정보 조회
         PathPredictionData rawData = pathRedisService.getPathPrediction(startCode, endCode);
