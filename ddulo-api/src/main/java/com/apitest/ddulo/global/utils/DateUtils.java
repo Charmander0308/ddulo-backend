@@ -2,6 +2,7 @@ package com.apitest.ddulo.global.utils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -9,6 +10,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.Locale;
 
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DateUtils {
 
@@ -66,5 +68,27 @@ public class DateUtils {
     public static String formatTime(String hhmm) {
         if (hhmm == null || hhmm.length() != 4) return hhmm;
         return hhmm.substring(0, 2) + ":" + hhmm.substring(2);
+    }
+
+    // Util: HH:mm:ss -> HH:mm (10분 단위 반올림)
+    public static String roundToNearest10Minutes(String timeStr) {
+        try {
+            LocalTime time = LocalTime.parse(timeStr, DateTimeFormatter.ofPattern("HH:mm:ss"));
+            int minute = time.getMinute();
+            // 반올림 로직: (분 + 5) / 10 * 10
+            int roundedMinute = ((minute + 5) / 10) * 10;
+
+            LocalTime targetTime;
+            if (roundedMinute == 60) {
+                targetTime = time.plusHours(1).withMinute(0).withSecond(0);
+            } else {
+                targetTime = time.withMinute(roundedMinute).withSecond(0);
+            }
+
+            return targetTime.format(DateTimeFormatter.ofPattern("HH:mm"));
+        } catch (Exception e) {
+            log.warn("Time format conversion failed: {}", timeStr);
+            return timeStr;
+        }
     }
 }

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -21,6 +22,7 @@ public class StationRedisService {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
+    private final StringRedisTemplate stringRedisTemplate;
 
     // Redis에서 역 상세정보(양 방향으로 인접한 열차 상태 3개씩 조회) 조회
     public StationDetailData getStationDetail(String stationCode) {
@@ -30,16 +32,17 @@ public class StationRedisService {
                 stationCode,
                 convertDateToDayKey(String.valueOf(LocalDate.now())),
                 getCurrentTimeKey()
-//                "WED",
-//                "1430"
         );
 
-        Object rawData = redisTemplate.opsForValue().get(redisKey);
+//        Object rawData = redisTemplate.opsForValue().get(redisKey);
+        // 문자열(JSON String) 상태 그대로 가져오기
+        String jsonValue = stringRedisTemplate.opsForValue().get(redisKey);
 
-        if (rawData == null) return null;   // 예외처리 로직 추가하기
+        if (jsonValue == null) return null;   // 예외처리 로직 추가하기
 
         try {
-            return objectMapper.readValue(rawData.toString(), StationDetailData.class);
+//            return objectMapper.readValue(rawData.toString(), StationDetailData.class);
+            return objectMapper.readValue(jsonValue, StationDetailData.class);
         } catch (Exception e) {
             log.error("Redis 데이터 변환 실패 - key: {}, error: {}", redisKey, e.getMessage(), e);
             throw new CustomException(ErrorCode.DATA_CONVERSION_ERROR);

@@ -20,3 +20,14 @@ services:
     ports:
       - '6379:6379'
     command: redis-server --requirepass ${REDIS_PWD}
+
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    container_name: mosquitto-container
+    ports:
+      - "1883:1883"  # MQTT 통신 포트
+      - "9001:9001"  # 웹소켓 포트 (선택 사항)
+    volumes:
+      - ../mosquitto/config:/mosquitto/config
+      - ../mosquitto/data:/mosquitto/data
+      - ../mosquitto/log:/mosquitto/log
