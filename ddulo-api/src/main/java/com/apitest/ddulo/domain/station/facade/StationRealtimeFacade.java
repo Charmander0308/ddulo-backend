@@ -34,9 +34,6 @@ public class StationRealtimeFacade {
 
         // redis에서 실시간 역/열차 정보 조회
         StationDetailData stationDetailData = stationRedisService.getStationDetail(stationCode);
-        // 데이터가 없는 경우 예외처리
-        if(stationDetailData == null)
-            throw new CustomException(ErrorCode.DATA_NOT_FOUND);
 
         // 인접 역 리스트 조회
         StationAdjacencyResult nearStations = stationAdjacencyService.getAdjacentStations(stationCode);

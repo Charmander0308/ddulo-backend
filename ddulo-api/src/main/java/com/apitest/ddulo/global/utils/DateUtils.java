@@ -72,23 +72,43 @@ public class DateUtils {
 
     // Util: HH:mm:ss -> HH:mm (10분 단위 반올림)
     public static String roundToNearest10Minutes(String timeStr) {
-        try {
-            LocalTime time = LocalTime.parse(timeStr, DateTimeFormatter.ofPattern("HH:mm:ss"));
-            int minute = time.getMinute();
-            // 반올림 로직: (분 + 5) / 10 * 10
-            int roundedMinute = ((minute + 5) / 10) * 10;
+        if (timeStr == null || timeStr.isEmpty()) {
+            return "00:00";
+        }
 
-            LocalTime targetTime;
-            if (roundedMinute == 60) {
-                targetTime = time.plusHours(1).withMinute(0).withSecond(0);
-            } else {
-                targetTime = time.withMinute(roundedMinute).withSecond(0);
+        try {
+            // 1. 문자열을 ':' 기준으로 자름 (예: "24:12:30")
+            String[] parts = timeStr.split(":");
+            int hour = Integer.parseInt(parts[0]);
+            int minute = Integer.parseInt(parts[1]);
+            // 초(parts[2])는 무시
+
+            // 2. 먼저 24시 이상을 00시로 보정 (예: 25:10 -> 1:10)
+            if (hour >= 24) {
+                hour = hour % 24;
             }
 
-            return targetTime.format(DateTimeFormatter.ofPattern("HH:mm"));
+            // 3. 분 반올림 로직: (분 + 5) / 10 * 10
+            int roundedMinute = ((minute + 5) / 10) * 10;
+
+            // 4. 60분이 되면 시간을 1시간 올리고 분을 0으로
+            if (roundedMinute == 60) {
+                roundedMinute = 0;
+                hour++;
+
+                // 시간을 올렸는데 또 24시가 넘으면 다시 보정 (예: 23:55 -> 24:00 -> 00:00)
+                if (hour >= 24) {
+                    hour = hour % 24;
+                }
+            }
+
+            // 5. "HH:mm" 포맷으로 조립해서 반환
+            return String.format("%02d:%02d", hour, roundedMinute);
+
         } catch (Exception e) {
-            log.warn("Time format conversion failed: {}", timeStr);
-            return timeStr;
+            log.warn("Time format conversion failed: {} -> Defaulting to 00:00", timeStr);
+            // 실패 시 원본(24:xx:xx)을 보내면 파이썬이 죽으므로, 안전하게 "00:00" 반환
+            return "00:00";
         }
     }
 }

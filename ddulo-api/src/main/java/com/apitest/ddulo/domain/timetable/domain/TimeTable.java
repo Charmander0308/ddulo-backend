@@ -59,10 +59,10 @@ public class TimeTable {
     @Column(length = 50)
     private String destStationName;   // SUBWAYENAME: 도착지하철역명
 
-    @Column(length = 1)
+    @Column(length = 10)
     private String weekTag;      // WEEK_TAG: 요일 (1:평일, 2:토, 3:휴일)
 
-    @Column(length = 1)
+    @Column(length = 10)
     private String inOutTag;     // INOUT_TAG: 상/하행선 (1:상행/내선, 2:하행/외선)
 
     @Column(length = 10)
