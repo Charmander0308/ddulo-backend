@@ -30,4 +30,13 @@ public class SubwayUtils {
             return "2";
         return null;
     }
+
+    // 방향을 정수 숫자로 변환
+    public static int getDirectionNumberInt(String direction) {
+        if(direction.equals("내선") || direction.equals("상행"))
+            return 0;
+        if(direction.equals("외선") || direction.equals("하행"))
+            return 1;
+        return -1;
+    }
 }

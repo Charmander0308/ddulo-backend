@@ -61,4 +61,10 @@ public class DateUtils {
 
         return nextBucketTime.format(DateTimeFormatter.ofPattern("HHmm"));
     }
+
+    // Util: HHmm -> HH:mm 으로 변환하는 메서드
+    public static String formatTime(String hhmm) {
+        if (hhmm == null || hhmm.length() != 4) return hhmm;
+        return hhmm.substring(0, 2) + ":" + hhmm.substring(2);
+    }
 }

@@ -28,4 +28,6 @@ public interface StationRepository
             @Param("stationName") String stationName,
             @Param("lineName") String lineName
     );
+
+    Optional<Station> findStationByStationNameAndLineName(String stationName, String lineName);
 }

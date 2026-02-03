@@ -3,6 +3,7 @@ package com.apitest.ddulo.domain.station.facade;
 import com.apitest.ddulo.domain.path.dto.response.PathPredictionResponse;
 import com.apitest.ddulo.domain.path.dto.response.ResultResponse;
 import com.apitest.ddulo.domain.path.service.PathPredictionService;
+import com.apitest.ddulo.domain.path.service.PythonPathService;
 import com.apitest.ddulo.domain.path.service.ResultService;
 import com.apitest.ddulo.domain.station.dto.response.FastestPathResponse;
 import com.apitest.ddulo.domain.station.dto.response.StationTotalResponse;
@@ -17,17 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class StationRouteFacade {
 
-    private final FastPathDataService fastPathDataService;  // 최단경로 조회 서비스
-    private final PathPredictionService pathPredictionService;  // 경로 예측 요약 정보 조회 서비스
-    private final ResultService resultService;  // 최종결과 반환 서비스
+    private final FastPathDataService fastPathDataService;
+    private final PathPredictionService pathPredictionService;
+    private final ResultService resultService;
+    private final PythonPathService pythonPathService;
 
-    /**
-     * 출발역과 도착역을 기반으로 전체 경로 정보를 조회합니다.
-     *
-     * @param startStationName 출발역명
-     * @param endStationName 도착역명
-     * @return 최단경로, 예측정보, 최종결과를 포함한 종합 응답
-     */
     @Transactional(readOnly = true)
     public StationTotalResponse getStationRoute(String startStationName, String endStationName) {
         log.info("경로 조회 시작 - 출발역: {}, 도착역: {}", startStationName, endStationName);
@@ -36,6 +31,9 @@ public class StationRouteFacade {
             // 최단 경로 조회
             FastestPathResponse fastestPathResponse = fastPathDataService.getSubwayRoute(startStationName, endStationName);
             log.debug("최단 경로 조회 완료: {}", fastestPathResponse);
+
+            // Python API 호출 (Redis 적재 트리거)
+            pythonPathService.triggerPythonPathCalculation(fastestPathResponse);
 
             // 경로 예측 정보 조회
             PathPredictionResponse pathPredictionResponse = pathPredictionService.predictPathDetails(
@@ -64,5 +62,4 @@ public class StationRouteFacade {
             throw e;
         }
     }
-
 }

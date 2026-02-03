@@ -1,5 +1,6 @@
-package com.apitest.ddulo.domain.station.service;
+package com.apitest.ddulo.domain.station.client;
 
+import com.apitest.ddulo.domain.path.dto.request.PythonPathRequest;
 import com.apitest.ddulo.domain.station.dto.request.PythonStationRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,9 @@ public class PythonApiClient {
     @Value("${python.api.url.station}")
     private String pythonStationUrl;
 
+    @Value("${python.api.url.path}")
+    private String pythonPathUrl;
+
     public void requestStationCalculation(PythonStationRequest request) {
         try {
             HttpHeaders headers = new HttpHeaders();
@@ -29,6 +33,20 @@ public class PythonApiClient {
 
             restTemplate.postForObject(pythonStationUrl, entity, String.class);
             log.info("Python API call success for station: {}", request.getStationId());
+        } catch (Exception e) {
+            log.error("Python API call failed: {}", e.getMessage());
+        }
+    }
+
+    public void requestPathCalculation(PythonPathRequest request) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<PythonPathRequest> entity = new HttpEntity<>(request, headers);
+
+            restTemplate.postForObject(pythonPathUrl, entity, String.class);
+            log.info("Python API call success for path calculation");
         } catch (Exception e) {
             log.error("Python API call failed: {}", e.getMessage());
         }

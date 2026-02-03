@@ -4,7 +4,7 @@ import com.apitest.ddulo.domain.station.dto.internal.StationAdjacencyResult;
 import com.apitest.ddulo.domain.station.dto.request.PythonStationRequest;
 import com.apitest.ddulo.domain.station.dto.response.StationArrivalResponse;
 import com.apitest.ddulo.domain.station.dto.external.redis.StationDetailData;
-import com.apitest.ddulo.domain.station.service.PythonApiClient;
+import com.apitest.ddulo.domain.station.client.PythonApiClient;
 import com.apitest.ddulo.domain.station.service.StationAdjacencyService;
 import com.apitest.ddulo.domain.station.service.StationRedisService;
 import com.apitest.ddulo.global.exception.CustomException;
