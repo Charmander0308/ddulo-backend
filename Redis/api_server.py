@@ -5,6 +5,7 @@ from typing import List
 import uvicorn
 
 # 기존 모듈 import
+from main_logic import process_platform_area_data, process_statistical_data
 from main_logic import optimized_path_calculate_and_save, station_status_calculate_and_save
 
 app = FastAPI()
@@ -61,4 +62,6 @@ def calculate_status(req: StationStatusRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
+    process_statistical_data()
+    process_platform_area_data()
     uvicorn.run(app, host="0.0.0.0", port=8001)

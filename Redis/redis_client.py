@@ -17,7 +17,7 @@ class RedisManager:
     REDIS_CONFIG = {
         'host': os.getenv("REDIS_HOST", "localhost"),
         'port': int(os.getenv("REDIS_PORT", 6379)),
-        'password': os.getenv("REDIS_PASSWORD", None),
+        'password': os.getenv("REDIS_PASSWORD", "1234d"),
         'db': int(os.getenv("REDIS_DB", 0)),
         'decode_responses': True,
         'socket_timeout': 5
