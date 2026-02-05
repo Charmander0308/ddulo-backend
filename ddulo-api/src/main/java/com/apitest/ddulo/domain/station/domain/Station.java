@@ -24,6 +24,9 @@ public class Station {
     @Column(nullable = false, unique = true)
     private String stationCode;
 
+    @Column(unique = true)
+    private String seoulStationCode;
+
     @Column(nullable = false)
     private String stationName;
 
@@ -47,6 +50,10 @@ public class Station {
     public void updateCoordinates(Double latitude, Double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
+    }
+
+    public void updateSeoulStationCode(String seoulStationCode) {
+        this.seoulStationCode = seoulStationCode;
     }
 }
 

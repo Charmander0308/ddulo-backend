@@ -6,7 +6,7 @@ deploy_job:
   tags:
     - ec2
   only:
-    - be/develop    # 'be/develop' 브랜치일 때만 실행
+    - main    # main 브랜치일 때만 실행
   script:
     - echo "EC2 Runner가 배포를 시작합니다"
 

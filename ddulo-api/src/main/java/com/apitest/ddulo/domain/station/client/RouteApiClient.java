@@ -1,5 +1,5 @@
 package com.apitest.ddulo.domain.station.client;
-import com.apitest.ddulo.domain.station.dto.SeoulApiDto;
+import com.apitest.ddulo.domain.station.dto.external.openapi.FastPathData;
 import com.apitest.ddulo.global.exception.CustomException;
 import com.apitest.ddulo.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class RouteApiClient {
     @Value("${seoul.api.url.shortest}")
     private String baseUrl;
 
-    public SeoulApiDto searchRoute(String startStation, String endStation) {
+    public FastPathData searchRoute(String startStation, String endStation) {
         // 현재 시간 포맷팅 (YYYY-MM-DD HH:mm:ss)
 //        String currentTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         String currentTime = LocalDateTime.now().withHour(10).withMinute(0).withSecond(0).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -39,7 +39,7 @@ public class RouteApiClient {
 
         try {
             // 호출 및 매핑
-            return restTemplate.getForObject(uri, SeoulApiDto.class);
+            return restTemplate.getForObject(uri, FastPathData.class);
         } catch (Exception e) {
             throw new CustomException(ErrorCode.EXTERNAL_API_ERROR);
         }

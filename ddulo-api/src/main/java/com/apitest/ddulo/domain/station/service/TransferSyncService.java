@@ -6,7 +6,7 @@ import com.apitest.ddulo.domain.metadata.service.ApiMetadataService;
 import com.apitest.ddulo.domain.station.client.TransferApiClient;
 import com.apitest.ddulo.domain.station.domain.Station;
 import com.apitest.ddulo.domain.station.domain.Transfer;
-import com.apitest.ddulo.domain.station.dto.FastTransferResponseDto;
+import com.apitest.ddulo.domain.station.dto.external.openapi.FastTransferData;
 import com.apitest.ddulo.domain.station.repository.StationRepository;
 import com.apitest.ddulo.domain.station.repository.TransferRepository;
 import lombok.RequiredArgsConstructor;
@@ -86,7 +86,7 @@ public class TransferSyncService {
         boolean hasNext = true;
 
         while (hasNext) {
-            FastTransferResponseDto response = null;
+            FastTransferData response = null;
             try {
                 response = transferApiClient.fetchTransferData(page, perPage);
             } catch (Exception e) {
@@ -116,10 +116,10 @@ public class TransferSyncService {
     }
 
     @Transactional
-    public void syncTransferData(List<FastTransferResponseDto.Data> dataList) {
+    public void syncTransferData(List<FastTransferData.Data> dataList) {
         int count = 0;
 
-        for (FastTransferResponseDto.Data dto : dataList) {
+        for (FastTransferData.Data dto : dataList) {
             // 4가지 조건 검증 (출발 조건 && 도착 조건)
             if (isValid(dto.getLineName(), dto.getOperator()) &&
                     isValid(dto.getTransferLineName(), dto.getTransferOperator())) {
@@ -138,7 +138,7 @@ public class TransferSyncService {
     }
 
     // 저장 메서드
-    private void saveTransferInfo(FastTransferResponseDto.Data dto) {
+    private void saveTransferInfo(FastTransferData.Data dto) {
         // 실제 Station 엔티티 찾기 (DB 조회)
         String cleanFromName = formatStationName(dto.getStationName());
         String cleanToName = formatStationName(dto.getTransferStationName());

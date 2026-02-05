@@ -1,0 +1,42 @@
+{
+  "context": {
+    "searchDate": "2026-01-28",
+    "dayOfWeek": "WED",
+    "searchTime": "1800",
+    "redisKey": "path:pred:221:748:WED:1800"
+  },
+
+  "totalTimeSec": 2340,
+  "results": [
+    {
+      "route": [
+        {
+          "stationId": 221,
+          "lineName": "2호선"
+        },
+        {
+          "stationId": 233,
+          "lineName": "7호선"
+        },
+        {
+          "stationId": 748,
+          "lineName": null
+        }
+      ],
+      "schedule": [
+        {
+          "departureTime": "2026-01-28T18:03:00",
+          "arrivalTime": "2026-01-28T18:42:00",
+          "waitingSec": 1500,
+          "boardingProbability": 0
+        },
+        {
+          "departureTime": "2026-01-28T18:33:00",
+          "arrivalTime": "2026-01-28T19:10:00",
+          "waitingSec": 180,
+          "boardingProbability": 92
+        }
+      ]
+    }
+  ]
+}
