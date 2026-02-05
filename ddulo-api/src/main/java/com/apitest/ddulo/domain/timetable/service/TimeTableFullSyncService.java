@@ -140,20 +140,21 @@ public class TimeTableFullSyncService {
     private String convertWeekTag(String val) {
         if ("DAY".equals(val)) return "1"; // 평일
         if ("SAT".equals(val)) return "2"; // 토요일
-        if ("HOL".equals(val)) return "3"; // 휴일
-        return "1";
+        if ("END".equals(val)) return "3"; // 휴일
+        return "-1";
     }
 
     private String convertInOutTag(String val) {
         // UP: 상행/내선(1), DOWN: 하행/외선(2)
-        if ("UP".equals(val)) return "1";
-        if ("DOWN".equals(val)) return "2";
-        return "1";
+        if ("UP".equals(val) || "IN".equals(val)) return "1";
+        if ("DOWN".equals(val) || "OUT".equals(val)) return "2";
+        return "-1";
     }
 
     private String convertExpress(String val) {
         // 0: 일반(G), 1: 급행(D)
         if ("1".equals(val)) return "D";
-        return "G";
+        if ("0".equals(val)) return "G";
+        return null;
     }
 }

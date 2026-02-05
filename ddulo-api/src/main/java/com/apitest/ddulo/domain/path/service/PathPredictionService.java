@@ -39,17 +39,18 @@ public class PathPredictionService {
     public PathPredictionResponse predictPathDetails(FastestPathResponse fastestPathResponse) {
         var leg = fastestPathResponse.getLegs();
 
-        //경로의 시작과 끝의 역 이름과 노선명 추출
+        //경로의 시작역 이름과 노선명 추출
         String startStationName = leg.get(0).getStartStation();
         String startLineName = leg.get(0).getLineName();
+        //경로의 도착역 이름과 노선명 추출
         String endStationName = leg.get(fastestPathResponse.getLegs().size() - 1).getEndStation();
         String endLineName = leg.get(fastestPathResponse.getLegs().size() - 1).getLineName();
     
-        //역코드 조회
+        //출발역 코드 조회
         String startCode = stationRepository.findStationCodeByNameAndLine(
                         StationUtils.addStationSuffix(startStationName), startLineName)
                 .orElseThrow(() -> new CustomException(ErrorCode.DATA_NOT_FOUND));
-
+        //도착역 코드 조회
         String endCode = stationRepository.findStationCodeByNameAndLine(
                         StationUtils.addStationSuffix(endStationName), endLineName)
                 .orElseThrow(() -> new CustomException(ErrorCode.DATA_NOT_FOUND));
@@ -73,9 +74,10 @@ public class PathPredictionService {
         LocalDate nowDate = LocalDate.now();    //2026-02-02
         LocalTime nowTime = LocalTime.now();    //02:08:21
         String currentTimeStr = nowTime.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-
-        String weekTag = DateUtils.convertDayKeyToWeekTag(DateUtils.convertDateToDayKey(String.valueOf(nowDate)));     //"1"(평일)
-        String direction = SubwayUtils.getDirectionNumber(fastestPathResponse.getLegs().get(0).getDirection()); //"1"(내선)
+        //요일을 변환 -> "1"(평일)
+        String weekTag = DateUtils.convertDayKeyToWeekTag(DateUtils.convertDateToDayKey(String.valueOf(nowDate)));
+        //방향을 변환 -> "1"(내선)
+        String direction = SubwayUtils.getDirectionNumber(fastestPathResponse.getLegs().get(0).getDirection());
 
         //가장 가까운 시간의 열차 3개 조회
         List<TimeTable> nextTrains = timeTableRepository.findNextTrains(
