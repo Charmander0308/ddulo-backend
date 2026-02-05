@@ -1,0 +1,803 @@
+{
+  "context": {
+    "targetDate": "2026-01-28",
+    "dayOfWeek": "WED",
+    "timeRange": "1430",
+    "redisKey": "path:222:748:WED:1430"
+  },
+  "totalTimeSecond": 2340,
+  "estimatedBoardingTime": "2026-01-28T14:30:00",
+  "boardingProbability": 12.3,
+  "startStation": [
+    {
+      "stationId": 222,
+      "stationName": "강남",
+      "lineName": "2호선",
+      "direction": 1,
+      "estimatedWaitingSec": 240,
+      "isBoardable": false,
+      "results": [
+        {
+          "carCongestions": [
+            {
+              "carNo": 1,
+              "congestionLevel": 90
+            },
+            {
+              "carNo": 2,
+              "congestionLevel": 80
+            },
+            {
+              "carNo": 3,
+              "congestionLevel": 70
+            },
+            {
+              "carNo": 4,
+              "congestionLevel": 60
+            },
+            {
+              "carNo": 5,
+              "congestionLevel": 30
+            },
+            {
+              "carNo": 6,
+              "congestionLevel": 90
+            },
+            {
+              "carNo": 7,
+              "congestionLevel": 60
+            },
+            {
+              "carNo": 8,
+              "congestionLevel": 40
+            },
+            {
+              "carNo": 9,
+              "congestionLevel": 60
+            },
+            {
+              "carNo": 10,
+              "congestionLevel": 40
+            }
+          ],
+          "stationCongestions": [
+            {
+              "carNo": 1,
+              "doorNo": 1,
+              "congestionLevel": 80
+            },
+            {
+              "carNo": 1,
+              "doorNo": 2,
+              "congestionLevel": 50
+            },
+            {
+              "carNo": 1,
+              "doorNo": 3,
+              "congestionLevel": 80
+            },
+            {
+              "carNo": 1,
+              "doorNo": 4,
+              "congestionLevel": 50
+            },
+            {
+              "carNo": 2,
+              "doorNo": 1,
+              "congestionLevel": 70
+            },
+            {
+              "carNo": 2,
+              "doorNo": 2,
+              "congestionLevel": 40
+            },
+            {
+              "carNo": 2,
+              "doorNo": 3,
+              "congestionLevel": 70
+            },
+            {
+              "carNo": 2,
+              "doorNo": 4,
+              "congestionLevel": 40
+            },
+            {
+              "carNo": 3,
+              "doorNo": 1,
+              "congestionLevel": 60
+            },
+            {
+              "carNo": 3,
+              "doorNo": 2,
+              "congestionLevel": 30
+            },
+            {
+              "carNo": 3,
+              "doorNo": 3,
+              "congestionLevel": 60
+            },
+            {
+              "carNo": 3,
+              "doorNo": 4,
+              "congestionLevel": 30
+            },
+            {
+              "carNo": 4,
+              "doorNo": 1,
+              "congestionLevel": 50
+            },
+            {
+              "carNo": 4,
+              "doorNo": 2,
+              "congestionLevel": 20
+            },
+            {
+              "carNo": 4,
+              "doorNo": 3,
+              "congestionLevel": 50
+            },
+            {
+              "carNo": 4,
+              "doorNo": 4,
+              "congestionLevel": 20
+            },
+            {
+              "carNo": 5,
+              "doorNo": 1,
+              "congestionLevel": 20
+            },
+            {
+              "carNo": 5,
+              "doorNo": 2,
+              "congestionLevel": 10
+            },
+            {
+              "carNo": 5,
+              "doorNo": 3,
+              "congestionLevel": 20
+            },
+            {
+              "carNo": 5,
+              "doorNo": 4,
+              "congestionLevel": 10
+            },
+            {
+              "carNo": 6,
+              "doorNo": 1,
+              "congestionLevel": 80
+            },
+            {
+              "carNo": 6,
+              "doorNo": 2,
+              "congestionLevel": 50
+            },
+            {
+              "carNo": 6,
+              "doorNo": 3,
+              "congestionLevel": 80
+            },
+            {
+              "carNo": 6,
+              "doorNo": 4,
+              "congestionLevel": 50
+            },
+            {
+              "carNo": 7,
+              "doorNo": 1,
+              "congestionLevel": 50
+            },
+            {
+              "carNo": 7,
+              "doorNo": 2,
+              "congestionLevel": 30
+            },
+            {
+              "carNo": 7,
+              "doorNo": 3,
+              "congestionLevel": 50
+            },
+            {
+              "carNo": 7,
+              "doorNo": 4,
+              "congestionLevel": 30
+            },
+            {
+              "carNo": 8,
+              "doorNo": 1,
+              "congestionLevel": 40
+            },
+            {
+              "carNo": 8,
+              "doorNo": 2,
+              "congestionLevel": 20
+            },
+            {
+              "carNo": 8,
+              "doorNo": 3,
+              "congestionLevel": 40
+            },
+            {
+              "carNo": 8,
+              "doorNo": 4,
+              "congestionLevel": 20
+            },
+            {
+              "carNo": 9,
+              "doorNo": 1,
+              "congestionLevel": 60
+            },
+            {
+              "carNo": 9,
+              "doorNo": 2,
+              "congestionLevel": 30
+            },
+            {
+              "carNo": 9,
+              "doorNo": 3,
+              "congestionLevel": 60
+            },
+            {
+              "carNo": 9,
+              "doorNo": 4,
+              "congestionLevel": 30
+            },
+            {
+              "carNo": 10,
+              "doorNo": 1,
+              "congestionLevel": 40
+            },
+            {
+              "carNo": 10,
+              "doorNo": 2,
+              "congestionLevel": 20
+            },
+            {
+              "carNo": 10,
+              "doorNo": 3,
+              "congestionLevel": 40
+            },
+            {
+              "carNo": 10,
+              "doorNo": 4,
+              "congestionLevel": 20
+            }
+          ],
+          "totalCongestions": [
+            {
+              "carNo": 1,
+              "doorNo": 1,
+              "congestionLevel": 85
+            },
+            {
+              "carNo": 1,
+              "doorNo": 2,
+              "congestionLevel": 55
+            },
+            {
+              "carNo": 1,
+              "doorNo": 3,
+              "congestionLevel": 85
+            },
+            {
+              "carNo": 1,
+              "doorNo": 4,
+              "congestionLevel": 55
+            },
+            {
+              "carNo": 2,
+              "doorNo": 1,
+              "congestionLevel": 75
+            },
+            {
+              "carNo": 2,
+              "doorNo": 2,
+              "congestionLevel": 45
+            },
+            {
+              "carNo": 2,
+              "doorNo": 3,
+              "congestionLevel": 75
+            },
+            {
+              "carNo": 2,
+              "doorNo": 4,
+              "congestionLevel": 45
+            },
+            {
+              "carNo": 3,
+              "doorNo": 1,
+              "congestionLevel": 65
+            },
+            {
+              "carNo": 3,
+              "doorNo": 2,
+              "congestionLevel": 35
+            },
+            {
+              "carNo": 3,
+              "doorNo": 3,
+              "congestionLevel": 65
+            },
+            {
+              "carNo": 3,
+              "doorNo": 4,
+              "congestionLevel": 35
+            },
+            {
+              "carNo": 4,
+              "doorNo": 1,
+              "congestionLevel": 55
+            },
+            {
+              "carNo": 4,
+              "doorNo": 2,
+              "congestionLevel": 25
+            },
+            {
+              "carNo": 4,
+              "doorNo": 3,
+              "congestionLevel": 55
+            },
+            {
+              "carNo": 4,
+              "doorNo": 4,
+              "congestionLevel": 25
+            },
+            {
+              "carNo": 5,
+              "doorNo": 1,
+              "congestionLevel": 25
+            },
+            {
+              "carNo": 5,
+              "doorNo": 2,
+              "congestionLevel": 15
+            },
+            {
+              "carNo": 5,
+              "doorNo": 3,
+              "congestionLevel": 25
+            },
+            {
+              "carNo": 5,
+              "doorNo": 4,
+              "congestionLevel": 15
+            },
+            {
+              "carNo": 6,
+              "doorNo": 1,
+              "congestionLevel": 85
+            },
+            {
+              "carNo": 6,
+              "doorNo": 2,
+              "congestionLevel": 55
+            },
+            {
+              "carNo": 6,
+              "doorNo": 3,
+              "congestionLevel": 85
+            },
+            {
+              "carNo": 6,
+              "doorNo": 4,
+              "congestionLevel": 55
+            },
+            {
+              "carNo": 7,
+              "doorNo": 1,
+              "congestionLevel": 55
+            },
+            {
+              "carNo": 7,
+              "doorNo": 2,
+              "congestionLevel": 35
+            },
+            {
+              "carNo": 7,
+              "doorNo": 3,
+              "congestionLevel": 55
+            },
+            {
+              "carNo": 7,
+              "doorNo": 4,
+              "congestionLevel": 35
+            },
+            {
+              "carNo": 8,
+              "doorNo": 1,
+              "congestionLevel": 45
+            },
+            {
+              "carNo": 8,
+              "doorNo": 2,
+              "congestionLevel": 25
+            },
+            {
+              "carNo": 8,
+              "doorNo": 3,
+              "congestionLevel": 45
+            },
+            {
+              "carNo": 8,
+              "doorNo": 4,
+              "congestionLevel": 25
+            },
+            {
+              "carNo": 9,
+              "doorNo": 1,
+              "congestionLevel": 65
+            },
+            {
+              "carNo": 9,
+              "doorNo": 2,
+              "congestionLevel": 35
+            },
+            {
+              "carNo": 9,
+              "doorNo": 3,
+              "congestionLevel": 65
+            },
+            {
+              "carNo": 9,
+              "doorNo": 4,
+              "congestionLevel": 35
+            },
+            {
+              "carNo": 10,
+              "doorNo": 1,
+              "congestionLevel": 45
+            },
+            {
+              "carNo": 10,
+              "doorNo": 2,
+              "congestionLevel": 25
+            },
+            {
+              "carNo": 10,
+              "doorNo": 3,
+              "congestionLevel": 45
+            },
+            {
+              "carNo": 10,
+              "doorNo": 4,
+              "congestionLevel": 25
+            }
+          ],
+          "bestBoardings": [
+            {
+              "carNo": 5,
+              "doorNo": 3
+            },
+            {
+              "carNo": 5,
+              "doorNo": 4
+            }
+          ],
+          "comfortBoarding": [
+            {
+              "carNo": 10,
+              "doorNo": 4
+            },
+            {
+              "carNo": 5,
+              "doorNo": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "stationId": 222,
+      "stationName": "강남",
+      "lineName": "2호선",
+      "direction": 1,
+      "estimatedWaitingSec": 540,
+      "isBoardable": true,
+      "results": []
+    },
+    {
+      "stationId": 222,
+      "stationName": "강남",
+      "lineName": "2호선",
+      "direction": 1,
+      "estimatedWaitingSec": 840,
+      "isBoardable": true,
+      "results": []
+    }
+  ],
+  "transferStation": [
+    {
+      "stations": [
+        {
+          "stationId": 233,
+          "stationName": "대림",
+          "lineName": "7호선",
+          "direction": 1,
+          "estimatedWaitingSec": 240,
+          "isBoardable": false,
+          "results": [
+            {
+              "carCongestions": [
+                {
+                  "carNo": 1,
+                  "congestionLevel": 80
+                },
+                {
+                  "carNo": 2,
+                  "congestionLevel": 85
+                },
+                {
+                  "carNo": 3,
+                  "congestionLevel": 70
+                },
+                {
+                  "carNo": 4,
+                  "congestionLevel": 50
+                },
+                {
+                  "carNo": 5,
+                  "congestionLevel": 40
+                },
+                {
+                  "carNo": 6,
+                  "congestionLevel": 30
+                },
+                {
+                  "carNo": 7,
+                  "congestionLevel": 20
+                },
+                {
+                  "carNo": 8,
+                  "congestionLevel": 10
+                }
+              ],
+              "stationCongestions": [
+                {
+                  "carNo": 1,
+                  "doorNo": 1,
+                  "congestionLevel": 80
+                },
+                {
+                  "carNo": 1,
+                  "doorNo": 2,
+                  "congestionLevel": 50
+                },
+                {
+                  "carNo": 1,
+                  "doorNo": 3,
+                  "congestionLevel": 80
+                },
+                {
+                  "carNo": 1,
+                  "doorNo": 4,
+                  "congestionLevel": 50
+                },
+                {
+                  "carNo": 8,
+                  "doorNo": 1,
+                  "congestionLevel": 10
+                },
+                {
+                  "carNo": 8,
+                  "doorNo": 2,
+                  "congestionLevel": 5
+                },
+                {
+                  "carNo": 8,
+                  "doorNo": 3,
+                  "congestionLevel": 10
+                },
+                {
+                  "carNo": 8,
+                  "doorNo": 4,
+                  "congestionLevel": 5
+                }
+              ],
+              "totalCongestions": [
+                {
+                  "carNo": 1,
+                  "doorNo": 1,
+                  "congestionLevel": 80
+                },
+                {
+                  "carNo": 1,
+                  "doorNo": 2,
+                  "congestionLevel": 50
+                },
+                {
+                  "carNo": 1,
+                  "doorNo": 3,
+                  "congestionLevel": 80
+                },
+                {
+                  "carNo": 1,
+                  "doorNo": 4,
+                  "congestionLevel": 50
+                },
+                {
+                  "carNo": 2,
+                  "doorNo": 1,
+                  "congestionLevel": 85
+                },
+                {
+                  "carNo": 2,
+                  "doorNo": 2,
+                  "congestionLevel": 55
+                },
+                {
+                  "carNo": 2,
+                  "doorNo": 3,
+                  "congestionLevel": 85
+                },
+                {
+                  "carNo": 2,
+                  "doorNo": 4,
+                  "congestionLevel": 55
+                },
+                {
+                  "carNo": 3,
+                  "doorNo": 1,
+                  "congestionLevel": 70
+                },
+                {
+                  "carNo": 3,
+                  "doorNo": 2,
+                  "congestionLevel": 40
+                },
+                {
+                  "carNo": 3,
+                  "doorNo": 3,
+                  "congestionLevel": 70
+                },
+                {
+                  "carNo": 3,
+                  "doorNo": 4,
+                  "congestionLevel": 40
+                },
+                {
+                  "carNo": 4,
+                  "doorNo": 1,
+                  "congestionLevel": 50
+                },
+                {
+                  "carNo": 4,
+                  "doorNo": 2,
+                  "congestionLevel": 20
+                },
+                {
+                  "carNo": 4,
+                  "doorNo": 3,
+                  "congestionLevel": 50
+                },
+                {
+                  "carNo": 4,
+                  "doorNo": 4,
+                  "congestionLevel": 20
+                },
+                {
+                  "carNo": 5,
+                  "doorNo": 1,
+                  "congestionLevel": 40
+                },
+                {
+                  "carNo": 5,
+                  "doorNo": 2,
+                  "congestionLevel": 15
+                },
+                {
+                  "carNo": 5,
+                  "doorNo": 3,
+                  "congestionLevel": 40
+                },
+                {
+                  "carNo": 5,
+                  "doorNo": 4,
+                  "congestionLevel": 15
+                },
+                {
+                  "carNo": 6,
+                  "doorNo": 1,
+                  "congestionLevel": 30
+                },
+                {
+                  "carNo": 6,
+                  "doorNo": 2,
+                  "congestionLevel": 10
+                },
+                {
+                  "carNo": 6,
+                  "doorNo": 3,
+                  "congestionLevel": 30
+                },
+                {
+                  "carNo": 6,
+                  "doorNo": 4,
+                  "congestionLevel": 10
+                },
+                {
+                  "carNo": 7,
+                  "doorNo": 1,
+                  "congestionLevel": 20
+                },
+                {
+                  "carNo": 7,
+                  "doorNo": 2,
+                  "congestionLevel": 5
+                },
+                {
+                  "carNo": 7,
+                  "doorNo": 3,
+                  "congestionLevel": 20
+                },
+                {
+                  "carNo": 7,
+                  "doorNo": 4,
+                  "congestionLevel": 5
+                },
+                {
+                  "carNo": 8,
+                  "doorNo": 1,
+                  "congestionLevel": 10
+                },
+                {
+                  "carNo": 8,
+                  "doorNo": 2,
+                  "congestionLevel": 5
+                },
+                {
+                  "carNo": 8,
+                  "doorNo": 3,
+                  "congestionLevel": 10
+                },
+                {
+                  "carNo": 8,
+                  "doorNo": 4,
+                  "congestionLevel": 5
+                }
+              ],
+              "bestBoardings": [
+                {
+                  "carNo": 4,
+                  "doorNo": 1
+                }
+              ],
+              "comfortBoarding": [
+                {
+                  "carNo": 8,
+                  "doorNo": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "stationId": 233,
+          "stationName": "대림",
+          "lineName": "7호선",
+          "direction": 1,
+          "estimatedWaitingSec": 540,
+          "isBoardable": true,
+          "results": []
+        },
+        {
+          "stationId": 233,
+          "stationName": "대림",
+          "lineName": "7호선",
+          "direction": 1,
+          "estimatedWaitingSec": 840,
+          "isBoardable": true,
+          "results": []
+        }
+      ]
+    }
+  ],
+  "endStation": {
+    "stationId": 748,
+    "stationName": "광명사거리",
+    "lineName": "7호선",
+    "NextStationName": null,
+    "estimatedWaitingSec": 0,
+    "results": []
+  }
+}
