@@ -1,5 +1,0 @@
-config/certs/
-*.key
-*.crt
-*.csr
-*.srl
