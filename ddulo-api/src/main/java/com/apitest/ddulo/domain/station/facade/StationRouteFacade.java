@@ -8,6 +8,8 @@ import com.apitest.ddulo.domain.path.service.ResultService;
 import com.apitest.ddulo.domain.station.dto.response.FastestPathResponse;
 import com.apitest.ddulo.domain.station.dto.response.StationTotalResponse;
 import com.apitest.ddulo.domain.station.service.FastPathDataService;
+import com.apitest.ddulo.global.exception.CustomException;
+import com.apitest.ddulo.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -59,7 +61,7 @@ public class StationRouteFacade {
             return response;
         } catch (Exception e) {
             log.error("경로 조회 실패 - 출발역: {}, 도착역: {}", startStationName, endStationName, e);
-            throw e;
+            throw new CustomException(ErrorCode.PATH_NOT_FOUND);
         }
     }
 }

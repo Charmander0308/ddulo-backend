@@ -35,7 +35,6 @@ public class StationRedisService {
                 getCurrentTimeKey()
         );
 
-//        Object rawData = redisTemplate.opsForValue().get(redisKey);
         // 문자열(JSON String) 상태 그대로 가져오기
         String jsonValue = stringRedisTemplate.opsForValue().get(redisKey);
 
@@ -43,7 +42,6 @@ public class StationRedisService {
             return createEmptyStationData(stationCode);
 
         try {
-//            return objectMapper.readValue(rawData.toString(), StationDetailData.class);
             return objectMapper.readValue(jsonValue, StationDetailData.class);
         } catch (Exception e) {
             log.error("Redis 데이터 변환 실패 - key: {}, error: {}", redisKey, e.getMessage(), e);

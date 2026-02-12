@@ -20,10 +20,8 @@ public class StationSyncFacade {
         // 서울시 역 코드 매핑 업데이트 (seoul_station_code.csv)
         stationDataSyncService.syncSeoulStationCodesIfNeeded();
 
-        new Thread(() -> {
-            log.info("시간표 동기화 백그라운드 작업 시작...");
-            timeTableFullSyncService.syncAdditionalTimeTable();
-        }).start();
+        log.info("시간표 동기화 백그라운드 작업 시작...");
+        timeTableFullSyncService.syncAdditionalTimeTable();
 
         log.info("기본 데이터 로딩 완료. 시간표는 백그라운드에서 계속 다운로드됩니다.");
     }

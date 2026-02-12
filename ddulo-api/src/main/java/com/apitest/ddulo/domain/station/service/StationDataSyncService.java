@@ -5,6 +5,8 @@ import com.apitest.ddulo.domain.metadata.repository.ApiMetadataRepository;
 import com.apitest.ddulo.domain.metadata.service.ApiMetadataService;
 import com.apitest.ddulo.domain.station.domain.Station;
 import com.apitest.ddulo.domain.station.repository.StationRepository;
+import com.apitest.ddulo.global.exception.CustomException;
+import com.apitest.ddulo.global.exception.ErrorCode;
 import com.opencsv.CSVReader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -107,7 +109,7 @@ public class StationDataSyncService {
 
         } catch (Exception e) {
             log.error("Seoul Station Code CSV 업데이트 중 오류 발생", e);
-            throw new RuntimeException("서울 역코드 업데이트 실패");
+            throw new CustomException(ErrorCode.CSV_FILE_LOAD_FAILED);
         }
     }
 
@@ -157,7 +159,7 @@ public class StationDataSyncService {
 
         } catch (Exception e) {
             log.error("CSV 초기화 중 오류 발생", e);
-            // throw new RuntimeException("데이터 초기화 실패");
+            throw new CustomException(ErrorCode.CSV_FILE_LOAD_FAILED);
         }
     }
 

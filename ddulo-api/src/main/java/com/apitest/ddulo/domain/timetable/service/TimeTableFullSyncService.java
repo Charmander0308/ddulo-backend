@@ -6,10 +6,13 @@ import com.apitest.ddulo.domain.station.repository.StationRepository;
 import com.apitest.ddulo.domain.timetable.domain.TimeTable;
 import com.apitest.ddulo.domain.timetable.repository.TimeTableBulkRepository;
 import com.apitest.ddulo.domain.timetable.repository.TimeTableRepository;
+import com.apitest.ddulo.global.exception.CustomException;
+import com.apitest.ddulo.global.exception.ErrorCode;
 import com.opencsv.CSVReader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -26,16 +30,19 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TimeTableFullSyncService {
     private static final String API_NAME = "SEOUL_TIMETABLE_FULL";
+    //플래그
+    private final AtomicBoolean isReady = new AtomicBoolean(false);
 
     private final StationRepository stationRepository;
-    private final TimeTableRepository timeTableRepository;
     private final ApiMetadataService apiMetadataService;
     private final TimeTableBulkRepository timeTableBulkRepository;
 
     //1, 2호선 시간표 추가 적재 로직
+    @Async
     public void syncAdditionalTimeTable() {
         if (!apiMetadataService.isApiCallNeeded(API_NAME)) {
             log.info("timetable full 데이터가 이미 존재하므로, 다음으로 넘어갑니다.");
+            isReady.set(true);
             return;
         }
         log.info("timetable full 데이터를 찾을 수 없으므로, 동기화를 실행합니다.");
@@ -103,10 +110,11 @@ public class TimeTableFullSyncService {
             log.info("==========================================");
 
             apiMetadataService.updateMetadata(API_NAME);
+            isReady.set(true);
 
         } catch (Exception e) {
-            log.error("추가 데이터 로딩 실패", e);
-            throw new RuntimeException(e);
+            log.error("추가 데이터: 열차 시간표 로딩 실패", e);
+            isReady.set(false);
         }
     }
 
@@ -157,4 +165,12 @@ public class TimeTableFullSyncService {
         if ("0".equals(val)) return "G";
         return null;
     }
+
+    //플래그 체크 메서드(시간표 로딩이 다 됐는지)
+    public void checkReady() {
+        if(!isReady.get()) {
+            throw new CustomException(ErrorCode.SERVICE_NOT_READY);
+        }
+    }
+
 }
